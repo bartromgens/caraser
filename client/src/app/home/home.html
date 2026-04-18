@@ -1,0 +1,16 @@
+<div class="home-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>API Health Check</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="spinner-wrapper" *ngIf="loading()">
+        <mat-spinner diameter="32"></mat-spinner>
+      </div>
+      <p *ngIf="error()" class="status-value">{{ error() }}</p>
+      <p *ngIf="healthStatus() && !loading()" class="status-value">
+        Status: {{ healthStatus() }}
+      </p>
+    </mat-card-content>
+  </mat-card>
+</div>
