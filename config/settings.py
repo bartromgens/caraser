@@ -79,6 +79,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 GEMINI_API_KEY: str = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_MODEL: str = "gemini-2.5-flash-image"
+GEMINI_IMAGE_SIZE: str = "1K"  # "512", "1K", "2K", or "4K"
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],

@@ -1,21 +1,76 @@
 <div class="home-container">
 
-  <!-- IDLE: drop zone -->
-  <div *ngIf="state() === 'idle'" class="dropzone"
-       [ngClass]="{ 'dropzone--active': isDragOver() }"
-       (dragover)="onDragOver($event)"
-       (dragleave)="onDragLeave()"
-       (drop)="onDrop($event)">
-    <mat-icon class="dropzone__icon">add_photo_alternate</mat-icon>
-    <p class="dropzone__heading">Upload a street photo</p>
-    <p class="dropzone__sub">Drag &amp; drop or click to browse</p>
-    <button mat-flat-button (click)="fileInput.click()">
-      <mat-icon>upload</mat-icon> Choose file
-    </button>
-    <input #fileInput type="file" accept="image/jpeg,image/png,image/webp"
-           style="display:none" (change)="onFileSelected($event)" />
-    <p class="dropzone__hint">JPEG · PNG · WebP · max 20 MB</p>
-  </div>
+  <!-- IDLE: options + drop zone -->
+  <ng-container *ngIf="state() === 'idle'">
+    <mat-card class="options-card">
+      <mat-card-content>
+        <div class="options-header">
+          <div>
+            <p class="options-title">Style options</p>
+            <p class="options-sub">Defaults already give a nice result — tweak anything you like.</p>
+          </div>
+          <button mat-button type="button" class="options-reset" (click)="resetOptions()">
+            <mat-icon>restart_alt</mat-icon> Reset
+          </button>
+        </div>
+
+        <div class="options-grid">
+          <div class="option-row">
+            <mat-slide-toggle [checked]="allowCars()" (change)="allowCars.set($event.checked)">
+              Still allow cars to drive through
+            </mat-slide-toggle>
+            <p class="option-hint">Keeps a slow, shared lane so cars are guests, not kings.</p>
+          </div>
+
+          <div class="option-row">
+            <mat-slide-toggle [checked]="fietsstraat()" (change)="fietsstraat.set($event.checked)">
+              Fietsstraat (red asphalt)
+            </mat-slide-toggle>
+            <p class="option-hint">Dutch bicycle street with deep red asphalt as the main surface.</p>
+          </div>
+
+          <div class="option-row">
+            <label class="option-label">Ground cover</label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-select [value]="groundCover()" (selectionChange)="groundCover.set($event.value)">
+                <mat-option value="mixed">Mixed (balanced)</mat-option>
+                <mat-option value="stones">Stones dominant</mat-option>
+                <mat-option value="grass">Grass dominant</mat-option>
+                <mat-option value="flowers">Flowers dominant</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="option-row">
+            <label class="option-label">Design language</label>
+            <mat-button-toggle-group
+              [value]="shapeStyle()"
+              (change)="shapeStyle.set($event.value)"
+              aria-label="Shape style">
+              <mat-button-toggle value="organic">Organic</mat-button-toggle>
+              <mat-button-toggle value="straight">Straight lines</mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="dropzone"
+         [ngClass]="{ 'dropzone--active': isDragOver() }"
+         (dragover)="onDragOver($event)"
+         (dragleave)="onDragLeave()"
+         (drop)="onDrop($event)">
+      <mat-icon class="dropzone__icon">add_photo_alternate</mat-icon>
+      <p class="dropzone__heading">Upload a street photo</p>
+      <p class="dropzone__sub">Drag &amp; drop or click to browse</p>
+      <button mat-flat-button (click)="fileInput.click()">
+        <mat-icon>upload</mat-icon> Choose file
+      </button>
+      <input #fileInput type="file" accept="image/jpeg,image/png,image/webp"
+             style="display:none" (change)="onFileSelected($event)" />
+      <p class="dropzone__hint">JPEG · PNG · WebP · max 20 MB</p>
+    </div>
+  </ng-container>
 
   <!-- WORKING: progress -->
   <div *ngIf="isWorking" class="progress-card">

@@ -1,14 +1,32 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { NgIf, NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatCardModule } from '@angular/material/card';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
-import { TransformationService, Transformation } from '../core/transformation.service';
+import {
+  GroundCover,
+  ShapeStyle,
+  Transformation,
+  TransformationOptions,
+  TransformationService,
+} from '../core/transformation.service';
 import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before-after-slider';
 
 type AppState = 'idle' | 'uploading' | 'processing' | 'done' | 'error';
+
+const DEFAULT_OPTIONS: TransformationOptions = {
+  allow_cars: false,
+  fietsstraat: false,
+  ground_cover: 'mixed',
+  shape_style: 'organic',
+};
 
 @Component({
   selector: 'app-home',
@@ -16,10 +34,15 @@ type AppState = 'idle' | 'uploading' | 'processing' | 'done' | 'error';
   imports: [
     NgIf,
     NgClass,
+    FormsModule,
     MatButtonModule,
+    MatButtonToggleModule,
+    MatCardModule,
+    MatFormFieldModule,
     MatIconModule,
     MatProgressBarModule,
-    MatCardModule,
+    MatSelectModule,
+    MatSlideToggleModule,
     BeforeAfterSliderComponent,
   ],
   templateUrl: './home.html',
@@ -35,6 +58,11 @@ export class HomeComponent {
 
   isDragOver = signal(false);
 
+  allowCars = signal<boolean>(DEFAULT_OPTIONS.allow_cars);
+  fietsstraat = signal<boolean>(DEFAULT_OPTIONS.fietsstraat);
+  groundCover = signal<GroundCover>(DEFAULT_OPTIONS.ground_cover);
+  shapeStyle = signal<ShapeStyle>(DEFAULT_OPTIONS.shape_style);
+
   get isWorking(): boolean {
     return this.state() === 'uploading' || this.state() === 'processing';
   }
@@ -45,7 +73,7 @@ export class HomeComponent {
 
   get statusLabel(): string {
     if (this.state() === 'uploading') return 'Uploading image…';
-    if (this.state() === 'processing') return 'Gemini is removing cars (this takes ~30 s)…';
+    if (this.state() === 'processing') return 'Caraser is erasing cars (this takes ~15 s)…';
     return '';
   }
 
@@ -70,6 +98,13 @@ export class HomeComponent {
     const file = input.files?.[0];
     if (file) this.processFile(file);
     input.value = '';
+  }
+
+  resetOptions(): void {
+    this.allowCars.set(DEFAULT_OPTIONS.allow_cars);
+    this.fietsstraat.set(DEFAULT_OPTIONS.fietsstraat);
+    this.groundCover.set(DEFAULT_OPTIONS.ground_cover);
+    this.shapeStyle.set(DEFAULT_OPTIONS.shape_style);
   }
 
   reset(): void {
@@ -105,14 +140,22 @@ export class HomeComponent {
       }
     }
     await navigator.clipboard.writeText(shareUrl);
-    // brief visual acknowledgment handled by template signal
+  }
+
+  private currentOptions(): TransformationOptions {
+    return {
+      allow_cars: this.allowCars(),
+      fietsstraat: this.fietsstraat(),
+      ground_cover: this.groundCover(),
+      shape_style: this.shapeStyle(),
+    };
   }
 
   private processFile(file: File): void {
     this.previewUrl.set(URL.createObjectURL(file));
     this.state.set('uploading');
 
-    this.service.upload(file).subscribe({
+    this.service.upload(file, this.currentOptions()).subscribe({
       next: (t) => {
         this.transformation.set(t);
         this.state.set('processing');

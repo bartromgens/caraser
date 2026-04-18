@@ -1,4 +1,3 @@
-import io
 import logging
 import threading
 import uuid
@@ -6,12 +5,21 @@ import uuid
 from django.core.files.base import ContentFile
 
 from .models import Transformation
-from .services.gemini import remove_cars
+from .services.gemini import PromptOptions, remove_cars
 
 logger = logging.getLogger(__name__)
 
 # NOTE: This uses a simple daemon thread for MVP. For production, replace with
 # Celery + Redis or another task queue to survive server restarts and scale.
+
+
+def _options_from(transformation: Transformation) -> PromptOptions:
+    return PromptOptions(
+        allow_cars=transformation.allow_cars,
+        fietsstraat=transformation.fietsstraat,
+        ground_cover=transformation.ground_cover,
+        shape_style=transformation.shape_style,
+    )
 
 
 def process_transformation(transformation_id: uuid.UUID) -> None:
@@ -29,7 +37,7 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
         name = transformation.original_image.name
         mime_type = "image/png" if name.lower().endswith(".png") else "image/jpeg"
 
-        result_bytes = remove_cars(image_bytes, mime_type)
+        result_bytes = remove_cars(image_bytes, mime_type, _options_from(transformation))
 
         filename = f"{transformation.pk}.png"
         transformation.result_image.save(filename, ContentFile(result_bytes), save=False)

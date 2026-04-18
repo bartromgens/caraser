@@ -2,6 +2,60 @@
   padding: 32px 24px;
   max-width: 800px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Options card */
+.options-card {
+  .options-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .options-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  .options-sub {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .options-reset {
+    flex-shrink: 0;
+  }
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px 24px;
+}
+
+.option-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.option-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
 }
 
 /* Drop zone */

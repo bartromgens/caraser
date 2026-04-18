@@ -16,6 +16,10 @@ class TransformationSerializer(serializers.ModelSerializer):
             "status",
             "error",
             "is_public",
+            "allow_cars",
+            "fietsstraat",
+            "ground_cover",
+            "shape_style",
             "created_at",
         ]
         read_only_fields = ["id", "result_image", "status", "error", "created_at"]

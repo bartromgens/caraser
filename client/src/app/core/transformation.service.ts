@@ -2,7 +2,17 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, interval, switchMap, takeWhile, distinctUntilChanged } from 'rxjs';
 
-export interface Transformation {
+export type GroundCover = 'mixed' | 'stones' | 'grass' | 'flowers';
+export type ShapeStyle = 'organic' | 'straight';
+
+export interface TransformationOptions {
+  allow_cars: boolean;
+  fietsstraat: boolean;
+  ground_cover: GroundCover;
+  shape_style: ShapeStyle;
+}
+
+export interface Transformation extends TransformationOptions {
   id: string;
   original_image: string;
   result_image: string | null;
@@ -23,9 +33,13 @@ export interface PaginatedTransformations {
 export class TransformationService {
   private readonly http = inject(HttpClient);
 
-  upload(file: File): Observable<Transformation> {
+  upload(file: File, options: TransformationOptions): Observable<Transformation> {
     const form = new FormData();
     form.append('image', file);
+    form.append('allow_cars', String(options.allow_cars));
+    form.append('fietsstraat', String(options.fietsstraat));
+    form.append('ground_cover', options.ground_cover);
+    form.append('shape_style', options.shape_style);
     return this.http.post<Transformation>('/api/transformations/upload/', form);
   }
 

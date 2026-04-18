@@ -10,12 +10,32 @@ class Transformation(models.Model):
         DONE = "done"
         FAILED = "failed"
 
+    class GroundCover(models.TextChoices):
+        MIXED = "mixed", "Mixed"
+        STONES = "stones", "Stones"
+        GRASS = "grass", "Grass"
+        FLOWERS = "flowers", "Flowers"
+
+    class ShapeStyle(models.TextChoices):
+        ORGANIC = "organic", "Organic"
+        STRAIGHT = "straight", "Straight"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     original_image = models.ImageField(upload_to="originals/%Y/%m/%d/")
     result_image = models.ImageField(upload_to="results/%Y/%m/%d/", blank=True, null=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     error = models.TextField(blank=True)
     is_public = models.BooleanField(default=True)
+
+    allow_cars = models.BooleanField(default=False)
+    fietsstraat = models.BooleanField(default=False)
+    ground_cover = models.CharField(
+        max_length=16, choices=GroundCover.choices, default=GroundCover.MIXED
+    )
+    shape_style = models.CharField(
+        max_length=16, choices=ShapeStyle.choices, default=ShapeStyle.ORGANIC
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

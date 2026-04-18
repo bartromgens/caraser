@@ -13,6 +13,8 @@ from .tasks import start_processing
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20 MB
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
+_TRUTHY = {"true", "1", "yes", "on"}
+
 
 def _validate_image(file) -> str | None:
     if file.size > MAX_FILE_SIZE:
@@ -29,6 +31,36 @@ def _validate_image(file) -> str | None:
     return None
 
 
+def _parse_bool(value: str | None, default: bool) -> bool:
+    if value is None:
+        return default
+    return str(value).strip().lower() in _TRUTHY
+
+
+def _parse_choice(value: str | None, choices: type, default: str) -> str:
+    if value is None:
+        return default
+    allowed = {c.value for c in choices}
+    return value if value in allowed else default
+
+
+def _extract_options(request: Request) -> dict:
+    return {
+        "allow_cars": _parse_bool(request.data.get("allow_cars"), default=False),
+        "fietsstraat": _parse_bool(request.data.get("fietsstraat"), default=False),
+        "ground_cover": _parse_choice(
+            request.data.get("ground_cover"),
+            Transformation.GroundCover,
+            Transformation.GroundCover.MIXED,
+        ),
+        "shape_style": _parse_choice(
+            request.data.get("shape_style"),
+            Transformation.ShapeStyle,
+            Transformation.ShapeStyle.ORGANIC,
+        ),
+    }
+
+
 @api_view(["POST"])
 @parser_classes([MultiPartParser])
 def transformation_create(request: Request) -> Response:
@@ -40,7 +72,10 @@ def transformation_create(request: Request) -> Response:
     if error:
         return Response({"detail": error}, status=status.HTTP_400_BAD_REQUEST)
 
-    transformation = Transformation.objects.create(original_image=file)
+    transformation = Transformation.objects.create(
+        original_image=file,
+        **_extract_options(request),
+    )
     start_processing(transformation.pk)
 
     serializer = TransformationSerializer(transformation, context={"request": request})
