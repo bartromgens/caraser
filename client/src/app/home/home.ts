@@ -18,8 +18,10 @@ import {
   TransformationService,
 } from '../core/transformation.service';
 import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before-after-slider';
+import { StreetViewPickerComponent } from '../shared/street-view-picker/street-view-picker';
 
 type AppState = 'idle' | 'uploading' | 'processing' | 'done' | 'error';
+type InputMode = 'upload' | 'streetview';
 
 const DEFAULT_OPTIONS: TransformationOptions = {
   allow_cars: false,
@@ -44,6 +46,7 @@ const DEFAULT_OPTIONS: TransformationOptions = {
     MatSelectModule,
     MatSlideToggleModule,
     BeforeAfterSliderComponent,
+    StreetViewPickerComponent,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
@@ -52,6 +55,7 @@ export class HomeComponent {
   private readonly service = inject(TransformationService);
 
   state = signal<AppState>('idle');
+  inputMode = signal<InputMode>('upload');
   errorMessage = signal('');
   transformation = signal<Transformation | null>(null);
   previewUrl = signal<string | null>(null);
@@ -149,6 +153,10 @@ export class HomeComponent {
       ground_cover: this.groundCover(),
       shape_style: this.shapeStyle(),
     };
+  }
+
+  onStreetViewCaptured(file: File): void {
+    this.processFile(file);
   }
 
   private processFile(file: File): void {

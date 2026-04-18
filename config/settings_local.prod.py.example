@@ -1,0 +1,27 @@
+# Production settings override.
+# Copy this file to settings_local.py on the VPS and fill in the values.
+# settings_local.py is gitignored and will not be committed.
+
+import os
+
+SECRET_KEY = "change-me-to-a-long-random-string"
+
+DEBUG = False
+
+ALLOWED_HOSTS = ["example.com"]
+
+CSRF_TRUSTED_ORIGINS = ["https://example.com"]
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# PostgreSQL -- matches the db service in docker-compose.prod.yml
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "caraser",
+        "USER": "caraser",
+        "HOST": "db",
+        "PORT": "5432",
+    }
+}
+
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")

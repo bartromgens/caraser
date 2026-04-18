@@ -55,7 +55,21 @@
       </mat-card-content>
     </mat-card>
 
-    <div class="dropzone"
+    <mat-button-toggle-group
+      [value]="inputMode()"
+      (change)="inputMode.set($event.value)"
+      class="mode-toggle"
+      aria-label="Input mode">
+      <mat-button-toggle value="upload">
+        <mat-icon>upload</mat-icon> Upload photo
+      </mat-button-toggle>
+      <mat-button-toggle value="streetview">
+        <mat-icon>map</mat-icon> From Street View
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <div *ngIf="inputMode() === 'upload'"
+         class="dropzone"
          [ngClass]="{ 'dropzone--active': isDragOver() }"
          (dragover)="onDragOver($event)"
          (dragleave)="onDragLeave()"
@@ -70,6 +84,12 @@
              style="display:none" (change)="onFileSelected($event)" />
       <p class="dropzone__hint">JPEG · PNG · WebP · max 20 MB</p>
     </div>
+
+    <app-street-view-picker
+      *ngIf="inputMode() === 'streetview'"
+      (imageSelected)="onStreetViewCaptured($event)">
+    </app-street-view-picker>
+
   </ng-container>
 
   <!-- WORKING: progress -->

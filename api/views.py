@@ -1,3 +1,4 @@
+from django.conf import settings
 from PIL import Image, UnidentifiedImageError
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
@@ -97,6 +98,11 @@ class GalleryPagination(PageNumberPagination):
     page_size = 12
     page_size_query_param = "page_size"
     max_page_size = 48
+
+
+@api_view(["GET"])
+def config(request: Request) -> Response:
+    return Response({"google_maps_api_key": settings.GOOGLE_MAPS_API_KEY})
 
 
 @api_view(["GET"])
