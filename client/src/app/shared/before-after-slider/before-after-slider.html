@@ -1,0 +1,37 @@
+<div class="slider-container" #container>
+  <!-- Before image (right side, always fully visible underneath) -->
+  <img class="slider-img slider-img--before" [src]="beforeUrl" [alt]="beforeLabel" />
+
+  <!-- After image (left side, clipped by slider position) -->
+  <img
+    class="slider-img slider-img--after"
+    [src]="afterUrl"
+    [alt]="afterLabel"
+    [style.clip-path]="'inset(0 ' + (100 - position()) + '% 0 0)'"
+  />
+
+  <!-- Labels -->
+  <span class="slider-label slider-label--before">{{ beforeLabel }}</span>
+  <span class="slider-label slider-label--after">{{ afterLabel }}</span>
+
+  <!-- Drag handle -->
+  <div
+    class="slider-handle"
+    #handle
+    role="slider"
+    [attr.aria-valuenow]="position()"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    [attr.aria-label]="'Slide to compare ' + beforeLabel + ' and ' + afterLabel"
+    tabindex="0"
+    [style.left]="position() + '%'"
+  >
+    <div class="slider-handle__line"></div>
+    <div class="slider-handle__circle">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8 5l-5 7 5 7M16 5l5 7-5 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="slider-handle__line"></div>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+<div class="view-container">
+
+  <div *ngIf="loading()" class="spinner-wrap">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
+  <div *ngIf="error()" class="error-wrap">
+    <p>{{ error() }}</p>
+    <a mat-flat-button routerLink="/">Go home</a>
+  </div>
+
+  <ng-container *ngIf="!loading() && !error() && transformation() as t">
+    <app-before-after-slider
+      [beforeUrl]="t.original_image"
+      [afterUrl]="t.result_image!"
+      beforeLabel="Before"
+      afterLabel="After">
+    </app-before-after-slider>
+
+    <div class="view-actions">
+      <button mat-flat-button (click)="download()">
+        <mat-icon>download</mat-icon> Download
+      </button>
+      <button mat-stroked-button (click)="share()">
+        <mat-icon>share</mat-icon> Share
+      </button>
+      <a mat-stroked-button routerLink="/">
+        <mat-icon>add_photo_alternate</mat-icon> Try your own
+      </a>
+      <a mat-stroked-button routerLink="/gallery">
+        <mat-icon>grid_view</mat-icon> Gallery
+      </a>
+    </div>
+  </ng-container>
+
+</div>

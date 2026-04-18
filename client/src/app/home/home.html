@@ -1,16 +1,66 @@
 <div class="home-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>API Health Check</mat-card-title>
-    </mat-card-header>
+
+  <!-- IDLE: drop zone -->
+  <div *ngIf="state() === 'idle'" class="dropzone"
+       [ngClass]="{ 'dropzone--active': isDragOver() }"
+       (dragover)="onDragOver($event)"
+       (dragleave)="onDragLeave()"
+       (drop)="onDrop($event)">
+    <mat-icon class="dropzone__icon">add_photo_alternate</mat-icon>
+    <p class="dropzone__heading">Upload a street photo</p>
+    <p class="dropzone__sub">Drag &amp; drop or click to browse</p>
+    <button mat-flat-button (click)="fileInput.click()">
+      <mat-icon>upload</mat-icon> Choose file
+    </button>
+    <input #fileInput type="file" accept="image/jpeg,image/png,image/webp"
+           style="display:none" (change)="onFileSelected($event)" />
+    <p class="dropzone__hint">JPEG · PNG · WebP · max 20 MB</p>
+  </div>
+
+  <!-- WORKING: progress -->
+  <div *ngIf="isWorking" class="progress-card">
+    <img *ngIf="previewUrl()" [src]="previewUrl()" class="preview-img" alt="Uploaded street photo" />
+    <div class="progress-info">
+      <p class="progress-label">{{ statusLabel }}</p>
+      <mat-progress-bar [mode]="progressMode"></mat-progress-bar>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <mat-card *ngIf="state() === 'error'" class="error-card">
     <mat-card-content>
-      <div class="spinner-wrapper" *ngIf="loading()">
-        <mat-spinner diameter="32"></mat-spinner>
+      <div class="error-body">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <p>{{ errorMessage() }}</p>
       </div>
-      <p *ngIf="error()" class="status-value">{{ error() }}</p>
-      <p *ngIf="healthStatus() && !loading()" class="status-value">
-        Status: {{ healthStatus() }}
-      </p>
     </mat-card-content>
+    <mat-card-actions>
+      <button mat-flat-button (click)="reset()">
+        <mat-icon>refresh</mat-icon> Try again
+      </button>
+    </mat-card-actions>
   </mat-card>
+
+  <!-- DONE: before/after slider + actions -->
+  <div *ngIf="state() === 'done' && transformation()" class="result">
+    <app-before-after-slider
+      [beforeUrl]="transformation()!.original_image"
+      [afterUrl]="transformation()!.result_image!"
+      beforeLabel="Before"
+      afterLabel="After">
+    </app-before-after-slider>
+
+    <div class="result-actions">
+      <button mat-flat-button (click)="download()">
+        <mat-icon>download</mat-icon> Download
+      </button>
+      <button mat-stroked-button (click)="share()">
+        <mat-icon>share</mat-icon> Share
+      </button>
+      <button mat-stroked-button (click)="reset()">
+        <mat-icon>add_photo_alternate</mat-icon> Try another
+      </button>
+    </div>
+  </div>
+
 </div>

@@ -2,15 +2,19 @@
   <button mat-icon-button (click)="sidenavOpened = !sidenavOpened" aria-label="Toggle menu">
     <mat-icon>menu</mat-icon>
   </button>
-  <span>{{ title }}</span>
+  <a routerLink="/" class="toolbar-brand">{{ title }}</a>
 </mat-toolbar>
 
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav [(opened)]="sidenavOpened" mode="side" class="sidenav">
     <mat-nav-list>
-      <a mat-list-item routerLink="/">
-        <mat-icon matListItemIcon>home</mat-icon>
-        Home
+      <a mat-list-item routerLink="/" (click)="sidenavOpened = false">
+        <mat-icon matListItemIcon>add_photo_alternate</mat-icon>
+        Upload
+      </a>
+      <a mat-list-item routerLink="/gallery" (click)="sidenavOpened = false">
+        <mat-icon matListItemIcon>grid_view</mat-icon>
+        Gallery
       </a>
     </mat-nav-list>
   </mat-sidenav>
