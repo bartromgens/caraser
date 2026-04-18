@@ -23,8 +23,6 @@ services:
     volumes:
       - ./config/settings_local.py:/app/config/settings_local.py:ro
       - ./media:/app/media
-    env_file:
-      - .env
     depends_on:
       db:
         condition: service_healthy
