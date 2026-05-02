@@ -15,7 +15,7 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 fi
 
 VPS_USER="bart"
-VPS_HOST="example.com"
+VPS_HOST="caraser.org"
 VPS_PATH="/home/bart/caraser"
 
 ssh "${VPS_USER}@${VPS_HOST}" bash <<EOF
