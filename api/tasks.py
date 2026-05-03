@@ -43,14 +43,12 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
 
     try:
         image_bytes = transformation.original_image.read()
-        name = transformation.original_image.name
-        mime_type = "image/png" if name.lower().endswith(".png") else "image/jpeg"
 
         prompt = build_prompt(_options_from(transformation))
         transformation.prompt = prompt
         transformation.save(update_fields=["prompt", "updated_at"])
 
-        result_bytes = _to_jpeg(remove_cars(image_bytes, mime_type, prompt=prompt))
+        result_bytes = _to_jpeg(remove_cars(image_bytes, prompt=prompt))
         comparison_bytes = build_comparison_image(image_bytes, result_bytes)
 
         transformation.result_image.save(

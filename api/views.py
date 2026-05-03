@@ -1,6 +1,8 @@
 import secrets
+from io import BytesIO
 
 from PIL import Image, UnidentifiedImageError
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser
@@ -16,6 +18,15 @@ MAX_FILE_SIZE = 20 * 1024 * 1024  # 20 MB
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
 _TRUTHY = {"true", "1", "yes", "on"}
+
+
+def _to_jpeg_upload(file) -> InMemoryUploadedFile:
+    buf = BytesIO()
+    Image.open(file).convert("RGB").save(buf, format="JPEG", quality=85)
+    buf.seek(0)
+    stem = file.name.rsplit(".", 1)[0] if "." in file.name else file.name
+    size = len(buf.getvalue())
+    return InMemoryUploadedFile(buf, "image", f"{stem}.jpg", "image/jpeg", size, None)
 
 
 def _validate_image(file) -> str | None:
@@ -74,6 +85,7 @@ def transformation_create(request: Request) -> Response:
     if error:
         return Response({"detail": error}, status=status.HTTP_400_BAD_REQUEST)
 
+    file = _to_jpeg_upload(file)
     transformation = Transformation.objects.create(
         original_image=file,
         **_extract_options(request),
