@@ -1,3 +1,5 @@
+import secrets
+
 from PIL import Image, UnidentifiedImageError
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
@@ -7,7 +9,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .models import Transformation
-from .serializers import TransformationSerializer
+from .serializers import TransformationCreateSerializer, TransformationSerializer
 from .tasks import start_processing
 
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20 MB
@@ -78,19 +80,36 @@ def transformation_create(request: Request) -> Response:
     )
     start_processing(transformation.pk)
 
-    serializer = TransformationSerializer(transformation, context={"request": request})
+    serializer = TransformationCreateSerializer(transformation, context={"request": request})
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
-@api_view(["GET"])
+@api_view(["GET", "DELETE"])
 def transformation_detail(request: Request, pk: str) -> Response:
     try:
         transformation = Transformation.objects.get(pk=pk)
     except (Transformation.DoesNotExist, Exception):
         return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
+    if request.method == "DELETE":
+        return _handle_delete(request, transformation)
+
     serializer = TransformationSerializer(transformation, context={"request": request})
     return Response(serializer.data)
+
+
+def _handle_delete(request: Request, transformation: Transformation) -> Response:
+    token = request.headers.get("X-Delete-Token", "")
+    if not token:
+        return Response({"detail": "Delete token required."}, status=status.HTTP_401_UNAUTHORIZED)
+    if not secrets.compare_digest(token, transformation.delete_token):
+        return Response({"detail": "Invalid delete token."}, status=status.HTTP_403_FORBIDDEN)
+
+    for field in (transformation.original_image, transformation.result_image, transformation.comparison_image):
+        if field:
+            field.delete(save=False)
+    transformation.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class GalleryPagination(PageNumberPagination):

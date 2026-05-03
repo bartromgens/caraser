@@ -16,6 +16,7 @@ import {
   TransformationOptions,
   TransformationService,
 } from '../core/transformation.service';
+import { DeleteTokenService } from '../core/delete-token.service';
 import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before-after-slider';
 
 type AppState = 'idle' | 'uploading' | 'processing' | 'done' | 'error';
@@ -48,6 +49,7 @@ const DEFAULT_OPTIONS: TransformationOptions = {
 })
 export class HomeComponent {
   private readonly service = inject(TransformationService);
+  private readonly tokenService = inject(DeleteTokenService);
 
   state = signal<AppState>('idle');
   errorMessage = signal('');
@@ -115,6 +117,24 @@ export class HomeComponent {
     }
   }
 
+  deleteTransformation(): void {
+    const t = this.transformation();
+    if (!t) return;
+    const token = this.tokenService.get(t.id);
+    if (!token) return;
+    if (!confirm('Delete this transformation and all its images? This cannot be undone.')) return;
+
+    this.service.delete(t.id, token).subscribe({
+      next: () => {
+        this.tokenService.remove(t.id);
+        this.reset();
+      },
+      error: () => {
+        alert('Delete failed. Please try again.');
+      },
+    });
+  }
+
   download(): void {
     const t = this.transformation();
     if (!t?.result_image) return;
@@ -165,6 +185,9 @@ export class HomeComponent {
 
     this.service.upload(file, this.currentOptions()).subscribe({
       next: (t) => {
+        if (t.delete_token) {
+          this.tokenService.save(t.id, t.delete_token);
+        }
         this.transformation.set(t);
         this.state.set('processing');
         this.startPolling(t.id);

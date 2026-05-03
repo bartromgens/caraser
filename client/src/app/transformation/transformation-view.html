@@ -39,6 +39,9 @@
       <a mat-stroked-button routerLink="/gallery">
         <mat-icon>grid_view</mat-icon> Gallery
       </a>
+      <button mat-stroked-button class="delete-btn" *ngIf="canDelete()" (click)="deleteTransformation()">
+        <mat-icon>delete</mat-icon> Delete
+      </button>
     </div>
   </ng-container>
 

@@ -13,6 +13,7 @@ alwaysApply: true
 
 - Review changes and remove duplicate code.
 - Extract functions and classes to improve readability and encapsulate logic.
+- Keep your summary of changes very concise.
 - Suggest a short commit message at the end. Start with a capital letter.
 
 ## Formatting

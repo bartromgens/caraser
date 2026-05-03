@@ -2,6 +2,23 @@ from rest_framework import serializers
 
 from .models import Transformation
 
+_COMMON_FIELDS = [
+    "id",
+    "original_image",
+    "result_image",
+    "comparison_image",
+    "status",
+    "error",
+    "is_public",
+    "allow_cars",
+    "fietsstraat",
+    "ground_cover",
+    "shape_style",
+    "created_at",
+]
+
+_COMMON_READ_ONLY = ["id", "result_image", "comparison_image", "status", "error", "created_at"]
+
 
 class TransformationSerializer(serializers.ModelSerializer):
     original_image = serializers.ImageField(use_url=True)
@@ -10,18 +27,12 @@ class TransformationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transformation
-        fields = [
-            "id",
-            "original_image",
-            "result_image",
-            "comparison_image",
-            "status",
-            "error",
-            "is_public",
-            "allow_cars",
-            "fietsstraat",
-            "ground_cover",
-            "shape_style",
-            "created_at",
-        ]
-        read_only_fields = ["id", "result_image", "comparison_image", "status", "error", "created_at"]
+        fields = _COMMON_FIELDS
+        read_only_fields = _COMMON_READ_ONLY
+
+
+class TransformationCreateSerializer(TransformationSerializer):
+    delete_token = serializers.CharField(read_only=True)
+
+    class Meta(TransformationSerializer.Meta):
+        fields = _COMMON_FIELDS + ["delete_token"]

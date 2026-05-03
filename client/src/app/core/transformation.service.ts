@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, interval, switchMap, takeWhile, distinctUntilChanged } from 'rxjs';
 
 export type GroundCover = 'mixed' | 'stones' | 'grass' | 'flowers';
@@ -21,6 +21,7 @@ export interface Transformation extends TransformationOptions {
   error: string;
   is_public: boolean;
   created_at: string;
+  delete_token?: string;
 }
 
 export interface PaginatedTransformations {
@@ -60,5 +61,10 @@ export class TransformationService {
       distinctUntilChanged((a, b) => a.status === b.status),
       takeWhile((t) => t.status !== 'done' && t.status !== 'failed', true),
     );
+  }
+
+  delete(id: string, token: string): Observable<void> {
+    const headers = new HttpHeaders({ 'X-Delete-Token': token });
+    return this.http.delete<void>(`/api/transformations/${id}/`, { headers });
   }
 }

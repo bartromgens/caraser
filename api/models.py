@@ -1,3 +1,4 @@
+import secrets
 import uuid
 
 from django.db import models
@@ -36,6 +37,8 @@ class Transformation(models.Model):
     shape_style = models.CharField(
         max_length=16, choices=ShapeStyle.choices, default=ShapeStyle.ORGANIC
     )
+
+    delete_token = models.CharField(max_length=64, default=secrets.token_urlsafe, editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

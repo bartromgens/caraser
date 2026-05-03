@@ -30,3 +30,9 @@
   height: auto;
   border-radius: 8px;
 }
+
+.delete-btn {
+  color: var(--mat-sys-error);
+  border-color: var(--mat-sys-error);
+  margin-left: auto;
+}
