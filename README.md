@@ -39,3 +39,9 @@ The Angular dev server runs on [http://localhost:4200](http://localhost:4200) an
    ```
 
 The `media/` folder (uploaded and generated images) is git-ignored and created automatically when the first image is processed.
+
+## Production management commands
+
+```bash
+docker compose -f docker-compose.prod.yml exec api python manage.py <command>
+```
