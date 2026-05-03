@@ -1,15 +1,15 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 import { TransformationService, Transformation } from '../../core/transformation.service';
+import { GalleryCardComponent } from '../../shared/gallery-card/gallery-card.component';
 
 @Component({
   selector: 'app-featured-strip',
   standalone: true,
-  imports: [NgIf, NgFor, RouterLink, MatButtonModule, MatIconModule],
+  imports: [NgIf, NgFor, RouterLink, MatIconModule, GalleryCardComponent],
   templateUrl: './featured-strip.component.html',
   styleUrl: './featured-strip.component.scss',
 })

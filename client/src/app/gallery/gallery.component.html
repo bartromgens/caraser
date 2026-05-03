@@ -13,18 +13,13 @@
   </p>
 
   <div class="gallery-grid">
-    <a *ngFor="let item of items(); let i = index" class="gallery-card" [routerLink]="['/t', item.id]">
-      <img
-        [src]="item.thumbnail_image || item.result_image"
-        [alt]="'Transformed street ' + item.id"
-        class="gallery-card__img"
-        [loading]="i === 0 ? 'eager' : 'lazy'"
-      />
-      <div class="gallery-card__overlay">
-        <mat-icon>compare</mat-icon>
-        <span>View comparison</span>
-      </div>
-    </a>
+    <app-gallery-card
+      *ngFor="let item of items(); let i = index"
+      [src]="item.thumbnail_image || item.result_image"
+      [alt]="'Transformed street ' + item.id"
+      [itemId]="item.id"
+      [imgLoading]="i === 0 ? 'eager' : 'lazy'"
+    />
   </div>
 
   <div *ngIf="hasNext()" class="load-more">

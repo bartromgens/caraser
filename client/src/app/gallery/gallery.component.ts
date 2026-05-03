@@ -1,17 +1,24 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 
 import { TransformationService, Transformation } from '../core/transformation.service';
 import { SeoService } from '../core/seo.service';
+import { GalleryCardComponent } from '../shared/gallery-card/gallery-card.component';
 
 @Component({
   selector: 'app-gallery',
   standalone: true,
-  imports: [NgIf, NgFor, RouterLink, MatButtonModule, MatProgressSpinnerModule, MatIconModule],
+  imports: [
+    NgIf,
+    NgFor,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    MatIconModule,
+    GalleryCardComponent,
+  ],
   templateUrl: './gallery.component.html',
   styleUrl: './gallery.component.scss',
 })

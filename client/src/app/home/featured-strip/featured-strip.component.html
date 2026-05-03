@@ -7,21 +7,13 @@
   </div>
 
   <div class="featured-strip__grid">
-    <a
+    <app-gallery-card
       *ngFor="let item of items(); let i = index"
-      class="featured-card"
-      [routerLink]="['/t', item.id]"
-    >
-      <img
-        [src]="item.thumbnail_image || item.result_image"
-        [alt]="'Transformed street'"
-        class="featured-card__img"
-        [loading]="i === 0 ? 'eager' : 'lazy'"
-      />
-      <div class="featured-card__overlay">
-        <mat-icon>compare</mat-icon>
-        <span>View comparison</span>
-      </div>
-    </a>
+      [src]="item.thumbnail_image || item.result_image"
+      alt="Transformed street"
+      [itemId]="item.id"
+      [imgLoading]="i === 0 ? 'eager' : 'lazy'"
+      borderRadius="12px"
+    />
   </div>
 </section>
