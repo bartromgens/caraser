@@ -12,8 +12,8 @@ import {
 @Component({
   selector: 'app-before-after-slider',
   standalone: true,
-  templateUrl: './before-after-slider.html',
-  styleUrl: './before-after-slider.scss',
+  templateUrl: './before-after-slider.component.html',
+  styleUrl: './before-after-slider.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BeforeAfterSliderComponent implements AfterViewInit, OnDestroy {

@@ -8,7 +8,7 @@ import { RouterLink } from '@angular/router';
 
 import { TransformationService, Transformation } from '../core/transformation.service';
 import { DeleteTokenService } from '../core/delete-token.service';
-import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before-after-slider';
+import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before-after-slider.component';
 
 @Component({
   selector: 'app-transformation-view',
@@ -21,8 +21,8 @@ import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before
     MatIconModule,
     BeforeAfterSliderComponent,
   ],
-  templateUrl: './transformation-view.html',
-  styleUrl: './transformation-view.scss',
+  templateUrl: './transformation-view.component.html',
+  styleUrl: './transformation-view.component.scss',
 })
 export class TransformationViewComponent implements OnInit {
   private readonly service = inject(TransformationService);

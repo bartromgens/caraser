@@ -42,8 +42,8 @@ const DEFAULT_OPTIONS: TransformationOptions = {
     MatSelectModule,
     MatSlideToggleModule,
   ],
-  templateUrl: './home.html',
-  styleUrl: './home.scss',
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss',
 })
 export class HomeComponent {
   private readonly service = inject(TransformationService);

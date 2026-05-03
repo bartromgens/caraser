@@ -11,8 +11,8 @@ import { TransformationService, Transformation } from '../core/transformation.se
   selector: 'app-gallery',
   standalone: true,
   imports: [NgIf, NgFor, RouterLink, MatButtonModule, MatProgressSpinnerModule, MatIconModule],
-  templateUrl: './gallery.html',
-  styleUrl: './gallery.scss',
+  templateUrl: './gallery.component.html',
+  styleUrl: './gallery.component.scss',
 })
 export class GalleryComponent implements OnInit {
   private readonly service = inject(TransformationService);
