@@ -37,17 +37,29 @@ def _draw_label(draw: ImageDraw.ImageDraw, text: str, x: int, y: int, font) -> N
     )
 
 
+def _crop_to_square(img: Image.Image) -> Image.Image:
+    side = min(img.width, img.height)
+    left = (img.width - side) // 2
+    top = (img.height - side) // 2
+    return img.crop((left, top, left + side, top + side))
+
+
 def build_comparison_image(before_bytes: bytes, after_bytes: bytes) -> bytes:
     before = Image.open(BytesIO(before_bytes)).convert("RGB")
     after = Image.open(BytesIO(after_bytes)).convert("RGB")
+
+    # Crop both images to square at the same relative position before stacking.
+    # The after image may differ in size from the original, so each is cropped
+    # independently (centre crop), then scaled to a common side length.
+    before = _crop_to_square(before)
+    after = _crop_to_square(after)
 
     target_w = min(before.width, after.width)
 
     def resize_to_width(img: Image.Image) -> Image.Image:
         if img.width == target_w:
             return img
-        ratio = target_w / img.width
-        return img.resize((target_w, round(img.height * ratio)), Image.LANCZOS)
+        return img.resize((target_w, target_w), Image.LANCZOS)
 
     before = resize_to_width(before)
     after = resize_to_width(after)
