@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { TransformationService, Transformation } from '../core/transformation.service';
 import { SeoService } from '../core/seo.service';
+import { TrackingService } from '../core/tracking.service';
 import { GalleryCardComponent } from '../shared/gallery-card/gallery-card.component';
 
 @Component({
@@ -25,6 +26,7 @@ import { GalleryCardComponent } from '../shared/gallery-card/gallery-card.compon
 export class GalleryComponent implements OnInit {
   private readonly service = inject(TransformationService);
   private readonly seo = inject(SeoService);
+  private readonly tracking = inject(TrackingService);
 
   items = signal<Transformation[]>([]);
   loading = signal(true);
@@ -43,6 +45,7 @@ export class GalleryComponent implements OnInit {
 
   loadMore(): void {
     this.page.update((p) => p + 1);
+    this.tracking.trackEvent('Gallery', 'load_more', undefined, this.page());
     this.load(true);
   }
 

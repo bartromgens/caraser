@@ -10,6 +10,7 @@ import { RouterLink } from '@angular/router';
 import { TransformationService, Transformation } from '../core/transformation.service';
 import { DeleteTokenService } from '../core/delete-token.service';
 import { SeoService } from '../core/seo.service';
+import { TrackingService } from '../core/tracking.service';
 import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before-after-slider.component';
 
 @Component({
@@ -33,6 +34,7 @@ export class TransformationViewComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly seo = inject(SeoService);
+  private readonly tracking = inject(TrackingService);
 
   transformation = signal<Transformation | null>(null);
   loading = signal(true);
@@ -65,6 +67,7 @@ export class TransformationViewComponent implements OnInit {
     if (!token) return;
     if (!confirm('Delete this transformation and all its images? This cannot be undone.')) return;
 
+    this.tracking.trackEvent('Transformation', 'delete', t.id);
     this.service.delete(t.id, token).subscribe({
       next: () => {
         this.tokenService.remove(t.id);
@@ -79,12 +82,14 @@ export class TransformationViewComponent implements OnInit {
   download(): void {
     const t = this.transformation();
     if (!t?.result_image) return;
+    this.tracking.trackEvent('Transformation', 'download', t.id);
     this.triggerDownload(t.result_image, `caraser-${t.id}.jpg`);
   }
 
   downloadComparison(): void {
     const t = this.transformation();
     if (!t?.comparison_image) return;
+    this.tracking.trackEvent('Transformation', 'download_comparison', t.id);
     this.triggerDownload(t.comparison_image, `caraser-${t.id}-comparison.jpg`);
   }
 
@@ -100,6 +105,7 @@ export class TransformationViewComponent implements OnInit {
     if (navigator.share) {
       try {
         await navigator.share({ title: 'Caraser – streets without cars', url: shareUrl });
+        this.tracking.trackEvent('Transformation', 'share', this.transformation()?.id);
         return;
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') return;
@@ -112,6 +118,7 @@ export class TransformationViewComponent implements OnInit {
     try {
       await navigator.clipboard.writeText(location.href);
       this.snackBar.open('Link copied to clipboard', undefined, { duration: 3000 });
+      this.tracking.trackEvent('Transformation', 'copy_link', this.transformation()?.id);
     } catch {
       this.snackBar.open('Could not copy link', undefined, { duration: 3000 });
     }

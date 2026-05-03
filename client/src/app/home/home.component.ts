@@ -17,6 +17,7 @@ import {
 } from '../core/transformation.service';
 import { DeleteTokenService } from '../core/delete-token.service';
 import { SeoService } from '../core/seo.service';
+import { TrackingService } from '../core/tracking.service';
 import { FeaturedStripComponent } from './featured-strip/featured-strip.component';
 
 type AppState = 'upload' | 'options' | 'uploading' | 'processing' | 'error';
@@ -51,6 +52,7 @@ export class HomeComponent implements OnInit {
   private readonly tokenService = inject(DeleteTokenService);
   private readonly router = inject(Router);
   private readonly seo = inject(SeoService);
+  private readonly tracking = inject(TrackingService);
 
   ngOnInit(): void {
     this.seo.reset();
@@ -118,6 +120,7 @@ export class HomeComponent implements OnInit {
     this.fietsstraat.set(DEFAULT_OPTIONS.fietsstraat);
     this.groundCover.set(DEFAULT_OPTIONS.ground_cover);
     this.shapeStyle.set(DEFAULT_OPTIONS.shape_style);
+    this.tracking.trackEvent('Upload', 'reset_options');
   }
 
   changeImage(): void {
@@ -127,6 +130,7 @@ export class HomeComponent implements OnInit {
     }
     this.selectedFile.set(null);
     this.state.set('upload');
+    this.tracking.trackEvent('Upload', 'change_image');
   }
 
   reset(): void {
@@ -143,6 +147,7 @@ export class HomeComponent implements OnInit {
     const file = this.selectedFile();
     if (!file) return;
     this.state.set('uploading');
+    this.tracking.trackEvent('Upload', 'generate');
 
     this.service.upload(file, this.currentOptions()).subscribe({
       next: (t) => {
@@ -155,6 +160,7 @@ export class HomeComponent implements OnInit {
       error: (err) => {
         this.state.set('error');
         this.errorMessage.set(err?.error?.detail ?? 'Upload failed. Please try again.');
+        this.tracking.trackEvent('Upload', 'upload_error');
       },
     });
   }
@@ -172,22 +178,26 @@ export class HomeComponent implements OnInit {
     this.selectedFile.set(file);
     this.previewUrl.set(URL.createObjectURL(file));
     this.state.set('options');
+    this.tracking.trackEvent('Upload', 'file_selected');
   }
 
   private startPolling(id: string): void {
     this.service.poll(id).subscribe({
       next: (t) => {
         if (t.status === 'done') {
+          this.tracking.trackEvent('Upload', 'generate_success');
           this.router.navigate(['/t', id]);
         }
         if (t.status === 'failed') {
           this.state.set('error');
           this.errorMessage.set(t.error || 'Processing failed.');
+          this.tracking.trackEvent('Upload', 'generate_error');
         }
       },
       error: () => {
         this.state.set('error');
         this.errorMessage.set('Lost connection while waiting for result.');
+        this.tracking.trackEvent('Upload', 'polling_error');
       },
     });
   }
