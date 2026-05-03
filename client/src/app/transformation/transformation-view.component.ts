@@ -9,6 +9,7 @@ import { RouterLink } from '@angular/router';
 
 import { TransformationService, Transformation } from '../core/transformation.service';
 import { DeleteTokenService } from '../core/delete-token.service';
+import { SeoService } from '../core/seo.service';
 import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before-after-slider.component';
 
 @Component({
@@ -31,6 +32,7 @@ export class TransformationViewComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly seo = inject(SeoService);
 
   transformation = signal<Transformation | null>(null);
   loading = signal(true);
@@ -44,6 +46,10 @@ export class TransformationViewComponent implements OnInit {
       next: (t) => {
         this.transformation.set(t);
         this.loading.set(false);
+        this.seo.set({
+          title: 'Street transformation',
+          description: 'See what this street looks like without cars, reimagined by Caraser.',
+        });
       },
       error: () => {
         this.error.set('Transformation not found or no longer available.');

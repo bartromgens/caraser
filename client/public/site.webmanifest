@@ -1,0 +1,16 @@
+{
+  "name": "Caraser",
+  "short_name": "Caraser",
+  "description": "See your street without cars",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbfaf3",
+  "theme_color": "#2e7d32",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}

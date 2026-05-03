@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { NgIf, NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +16,7 @@ import {
   TransformationService,
 } from '../core/transformation.service';
 import { DeleteTokenService } from '../core/delete-token.service';
+import { SeoService } from '../core/seo.service';
 import { FeaturedStripComponent } from './featured-strip/featured-strip.component';
 
 type AppState = 'upload' | 'options' | 'uploading' | 'processing' | 'error';
@@ -24,7 +25,7 @@ const DEFAULT_OPTIONS: TransformationOptions = {
   allow_cars: false,
   fietsstraat: false,
   ground_cover: 'mixed',
-  shape_style: 'organic',
+  shape_style: 'mixed',
 };
 
 @Component({
@@ -45,10 +46,15 @@ const DEFAULT_OPTIONS: TransformationOptions = {
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   private readonly service = inject(TransformationService);
   private readonly tokenService = inject(DeleteTokenService);
   private readonly router = inject(Router);
+  private readonly seo = inject(SeoService);
+
+  ngOnInit(): void {
+    this.seo.reset();
+  }
 
   state = signal<AppState>('upload');
   errorMessage = signal('');

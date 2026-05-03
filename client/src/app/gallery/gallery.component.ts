@@ -6,6 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 
 import { TransformationService, Transformation } from '../core/transformation.service';
+import { SeoService } from '../core/seo.service';
 
 @Component({
   selector: 'app-gallery',
@@ -16,6 +17,7 @@ import { TransformationService, Transformation } from '../core/transformation.se
 })
 export class GalleryComponent implements OnInit {
   private readonly service = inject(TransformationService);
+  private readonly seo = inject(SeoService);
 
   items = signal<Transformation[]>([]);
   loading = signal(true);
@@ -24,6 +26,11 @@ export class GalleryComponent implements OnInit {
   hasNext = signal(false);
 
   ngOnInit(): void {
+    this.seo.set({
+      title: 'Gallery',
+      description:
+        'Browse street photos transformed by Caraser – see what these spaces look like without cars.',
+    });
     this.load();
   }
 
