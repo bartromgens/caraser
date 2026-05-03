@@ -37,6 +37,11 @@ _GROUND_COVER_LINE = {
 
 
 _SHAPE_STYLE_LINE = {
+    Transformation.ShapeStyle.MIXED: (
+        "- Combine curved, flowing organic shapes with clean geometric straight "
+        "lines: e.g. softly curving planted beds beside rectangular paving panels "
+        "or linear seating edges; balanced, varied, neither fully formal nor fully wild"
+    ),
     Transformation.ShapeStyle.ORGANIC: (
         "- Use curved, flowing, organic shapes for paths and planted beds; irregular, "
         "natural-looking layouts"
@@ -44,11 +49,6 @@ _SHAPE_STYLE_LINE = {
     Transformation.ShapeStyle.STRAIGHT: (
         "- Use clean geometric straight lines and rectangular forms for paths and planted "
         "beds; structured and orderly layout"
-    ),
-    Transformation.ShapeStyle.FORMAL: (
-        "- Use a strictly symmetrical, axial layout with mirrored planting beds and a "
-        "central path; classical formal garden arrangement with clipped hedges and "
-        "matching tree rows on each side"
     ),
     Transformation.ShapeStyle.WILDERNESS: (
         "- Use dense, unstructured naturalistic planting with no defined hard edges; "

@@ -18,9 +18,9 @@ class Transformation(models.Model):
         FLOWERS = "flowers", "Flowers"
 
     class ShapeStyle(models.TextChoices):
+        MIXED = "mixed", "Mixed"
         ORGANIC = "organic", "Organic"
         STRAIGHT = "straight", "Straight"
-        FORMAL = "formal", "Formal"
         WILDERNESS = "wilderness", "Wilderness"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -38,7 +38,7 @@ class Transformation(models.Model):
         max_length=16, choices=GroundCover.choices, default=GroundCover.MIXED
     )
     shape_style = models.CharField(
-        max_length=16, choices=ShapeStyle.choices, default=ShapeStyle.ORGANIC
+        max_length=16, choices=ShapeStyle.choices, default=ShapeStyle.MIXED
     )
 
     is_featured = models.BooleanField(default=False, db_index=True)

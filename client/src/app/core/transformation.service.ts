@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, interval, switchMap, takeWhile, distinctUntilChanged } from 'rxjs';
 
 export type GroundCover = 'mixed' | 'stones' | 'grass' | 'flowers';
-export type ShapeStyle = 'organic' | 'straight' | 'formal' | 'wilderness';
+export type ShapeStyle = 'mixed' | 'organic' | 'straight' | 'wilderness';
 
 export interface TransformationOptions {
   allow_cars: boolean;

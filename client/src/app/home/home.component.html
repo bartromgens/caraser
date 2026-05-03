@@ -83,9 +83,9 @@
             <label class="option-label">Design language</label>
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-select [value]="shapeStyle()" (selectionChange)="shapeStyle.set($event.value)">
+                <mat-option value="mixed">Mixed (balanced)</mat-option>
                 <mat-option value="organic">Organic</mat-option>
                 <mat-option value="straight">Straight lines</mat-option>
-                <mat-option value="formal">Formal</mat-option>
                 <mat-option value="wilderness">Wilderness</mat-option>
               </mat-select>
             </mat-form-field>
