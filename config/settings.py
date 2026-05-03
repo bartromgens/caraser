@@ -86,6 +86,7 @@ GEMINI_IMAGE_SIZE: str = "1K"  # "512", "1K", "2K", or "4K"
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
 }
 
 CORS_ALLOWED_ORIGINS: list[str] = []
