@@ -1,8 +1,41 @@
 <div class="home-container">
-  <!-- IDLE: options + drop zone -->
-  <ng-container *ngIf="state() === 'idle'">
+  <!-- STEP 1: Upload dropzone -->
+  <ng-container *ngIf="isUploadStep">
+    <div
+      class="dropzone"
+      [ngClass]="{ 'dropzone--active': isDragOver() }"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)"
+    >
+      <mat-icon class="dropzone__icon">add_photo_alternate</mat-icon>
+      <p class="dropzone__heading">Upload a street photo</p>
+      <p class="dropzone__sub">Drag &amp; drop or click to browse</p>
+      <button mat-flat-button (click)="fileInput.click()">
+        <mat-icon>upload</mat-icon> Choose file
+      </button>
+      <input
+        #fileInput
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        style="display: none"
+        (change)="onFileSelected($event)"
+      />
+      <p class="dropzone__hint">JPEG · PNG · WebP · max 20 MB</p>
+    </div>
+  </ng-container>
+
+  <!-- STEP 2: Style options -->
+  <ng-container *ngIf="isOptionsStep">
     <mat-card class="options-card">
       <mat-card-content>
+        <img
+          *ngIf="previewUrl()"
+          [src]="previewUrl()"
+          class="options-preview"
+          alt="Uploaded street photo"
+        />
+
         <div class="options-header">
           <div>
             <p class="options-title">Style options</p>
@@ -58,31 +91,17 @@
             </mat-button-toggle-group>
           </div>
         </div>
+
+        <div class="options-actions">
+          <button mat-stroked-button type="button" (click)="changeImage()">
+            <mat-icon>arrow_back</mat-icon> Change image
+          </button>
+          <button mat-flat-button type="button" (click)="generate()">
+            <mat-icon>auto_fix_high</mat-icon> Generate image
+          </button>
+        </div>
       </mat-card-content>
     </mat-card>
-
-    <div
-      class="dropzone"
-      [ngClass]="{ 'dropzone--active': isDragOver() }"
-      (dragover)="onDragOver($event)"
-      (dragleave)="onDragLeave()"
-      (drop)="onDrop($event)"
-    >
-      <mat-icon class="dropzone__icon">add_photo_alternate</mat-icon>
-      <p class="dropzone__heading">Upload a street photo</p>
-      <p class="dropzone__sub">Drag &amp; drop or click to browse</p>
-      <button mat-flat-button (click)="fileInput.click()">
-        <mat-icon>upload</mat-icon> Choose file
-      </button>
-      <input
-        #fileInput
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        style="display: none"
-        (change)="onFileSelected($event)"
-      />
-      <p class="dropzone__hint">JPEG · PNG · WebP · max 20 MB</p>
-    </div>
   </ng-container>
 
   <!-- WORKING: progress -->

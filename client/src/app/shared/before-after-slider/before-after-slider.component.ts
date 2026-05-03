@@ -47,6 +47,7 @@ export class BeforeAfterSliderComponent implements AfterViewInit, OnDestroy {
     };
     const onTouchMove = (e: TouchEvent) => {
       if (!this.dragging) return;
+      e.preventDefault();
       this.updateFromClientX(e.touches[0].clientX, container);
     };
     const onEnd = () => {
@@ -60,7 +61,7 @@ export class BeforeAfterSliderComponent implements AfterViewInit, OnDestroy {
     handle.addEventListener('mousedown', onMouseDown);
     handle.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('mouseup', onEnd);
     window.addEventListener('touchend', onEnd);
     handle.addEventListener('keydown', onKeyDown);

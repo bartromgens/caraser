@@ -18,7 +18,7 @@ import {
 } from '../core/transformation.service';
 import { DeleteTokenService } from '../core/delete-token.service';
 
-type AppState = 'idle' | 'uploading' | 'processing' | 'error';
+type AppState = 'upload' | 'options' | 'uploading' | 'processing' | 'error';
 
 const DEFAULT_OPTIONS: TransformationOptions = {
   allow_cars: false,
@@ -50,9 +50,10 @@ export class HomeComponent {
   private readonly tokenService = inject(DeleteTokenService);
   private readonly router = inject(Router);
 
-  state = signal<AppState>('idle');
+  state = signal<AppState>('upload');
   errorMessage = signal('');
   previewUrl = signal<string | null>(null);
+  selectedFile = signal<File | null>(null);
 
   isDragOver = signal(false);
 
@@ -63,6 +64,14 @@ export class HomeComponent {
 
   get isWorking(): boolean {
     return this.state() === 'uploading' || this.state() === 'processing';
+  }
+
+  get isUploadStep(): boolean {
+    return this.state() === 'upload';
+  }
+
+  get isOptionsStep(): boolean {
+    return this.state() === 'options';
   }
 
   get progressMode(): 'indeterminate' | 'buffer' {
@@ -105,26 +114,28 @@ export class HomeComponent {
     this.shapeStyle.set(DEFAULT_OPTIONS.shape_style);
   }
 
+  changeImage(): void {
+    if (this.previewUrl()) {
+      URL.revokeObjectURL(this.previewUrl()!);
+      this.previewUrl.set(null);
+    }
+    this.selectedFile.set(null);
+    this.state.set('upload');
+  }
+
   reset(): void {
-    this.state.set('idle');
+    this.state.set('upload');
     this.errorMessage.set('');
+    this.selectedFile.set(null);
     if (this.previewUrl()) {
       URL.revokeObjectURL(this.previewUrl()!);
       this.previewUrl.set(null);
     }
   }
 
-  private currentOptions(): TransformationOptions {
-    return {
-      allow_cars: this.allowCars(),
-      fietsstraat: this.fietsstraat(),
-      ground_cover: this.groundCover(),
-      shape_style: this.shapeStyle(),
-    };
-  }
-
-  private processFile(file: File): void {
-    this.previewUrl.set(URL.createObjectURL(file));
+  generate(): void {
+    const file = this.selectedFile();
+    if (!file) return;
     this.state.set('uploading');
 
     this.service.upload(file, this.currentOptions()).subscribe({
@@ -140,6 +151,21 @@ export class HomeComponent {
         this.errorMessage.set(err?.error?.detail ?? 'Upload failed. Please try again.');
       },
     });
+  }
+
+  private currentOptions(): TransformationOptions {
+    return {
+      allow_cars: this.allowCars(),
+      fietsstraat: this.fietsstraat(),
+      ground_cover: this.groundCover(),
+      shape_style: this.shapeStyle(),
+    };
+  }
+
+  private processFile(file: File): void {
+    this.selectedFile.set(file);
+    this.previewUrl.set(URL.createObjectURL(file));
+    this.state.set('options');
   }
 
   private startPolling(id: string): void {

@@ -48,11 +48,11 @@
   gap: 16px;
 
   @media (min-width: 600px) {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
   }
 
   @media (min-width: 1024px) {
-    grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(480px, 100%), 1fr));
   }
 }
 
@@ -94,5 +94,15 @@
 
   &:hover &__overlay {
     opacity: 1;
+  }
+
+  @media (hover: none) {
+    &__overlay {
+      opacity: 0.85;
+      font-size: 0.8rem;
+      padding: 6px;
+      justify-content: flex-end;
+      background: linear-gradient(to top, color-mix(in srgb, var(--mat-sys-primary) 70%, black) 0%, transparent 100%);
+    }
   }
 }
