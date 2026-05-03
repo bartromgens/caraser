@@ -18,8 +18,9 @@
     </app-before-after-slider>
 
     <div class="view-actions">
-      <button mat-flat-button (click)="t.comparison_image ? downloadComparison() : download()">
-        <mat-icon>download</mat-icon> Download
+      <button mat-flat-button (click)="download()"><mat-icon>download</mat-icon> Download</button>
+      <button mat-stroked-button *ngIf="t.comparison_image" (click)="downloadComparison()">
+        <mat-icon>compare</mat-icon> Download comparison
       </button>
       <button mat-stroked-button (click)="share()"><mat-icon>share</mat-icon> Share</button>
       <button mat-stroked-button (click)="copyLink()"><mat-icon>link</mat-icon> Copy link</button>
