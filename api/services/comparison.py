@@ -17,7 +17,7 @@ def _load_font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
     try:
         return ImageFont.truetype(_FONT_PATH, size)
     except OSError:
-        return ImageFont.load_default()
+        return ImageFont.load_default(size=size)
 
 
 def _draw_label(draw: ImageDraw.ImageDraw, text: str, x: int, y: int, font) -> None:
