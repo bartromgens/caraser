@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { NgIf, NgClass } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
@@ -12,14 +13,12 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import {
   GroundCover,
   ShapeStyle,
-  Transformation,
   TransformationOptions,
   TransformationService,
 } from '../core/transformation.service';
 import { DeleteTokenService } from '../core/delete-token.service';
-import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before-after-slider';
 
-type AppState = 'idle' | 'uploading' | 'processing' | 'done' | 'error';
+type AppState = 'idle' | 'uploading' | 'processing' | 'error';
 
 const DEFAULT_OPTIONS: TransformationOptions = {
   allow_cars: false,
@@ -42,7 +41,6 @@ const DEFAULT_OPTIONS: TransformationOptions = {
     MatProgressBarModule,
     MatSelectModule,
     MatSlideToggleModule,
-    BeforeAfterSliderComponent,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
@@ -50,10 +48,10 @@ const DEFAULT_OPTIONS: TransformationOptions = {
 export class HomeComponent {
   private readonly service = inject(TransformationService);
   private readonly tokenService = inject(DeleteTokenService);
+  private readonly router = inject(Router);
 
   state = signal<AppState>('idle');
   errorMessage = signal('');
-  transformation = signal<Transformation | null>(null);
   previewUrl = signal<string | null>(null);
 
   isDragOver = signal(false);
@@ -109,65 +107,11 @@ export class HomeComponent {
 
   reset(): void {
     this.state.set('idle');
-    this.transformation.set(null);
     this.errorMessage.set('');
     if (this.previewUrl()) {
       URL.revokeObjectURL(this.previewUrl()!);
       this.previewUrl.set(null);
     }
-  }
-
-  deleteTransformation(): void {
-    const t = this.transformation();
-    if (!t) return;
-    const token = this.tokenService.get(t.id);
-    if (!token) return;
-    if (!confirm('Delete this transformation and all its images? This cannot be undone.')) return;
-
-    this.service.delete(t.id, token).subscribe({
-      next: () => {
-        this.tokenService.remove(t.id);
-        this.reset();
-      },
-      error: () => {
-        alert('Delete failed. Please try again.');
-      },
-    });
-  }
-
-  download(): void {
-    const t = this.transformation();
-    if (!t?.result_image) return;
-    this.triggerDownload(t.result_image, `caraser-${t.id}.png`);
-  }
-
-  downloadComparison(): void {
-    const t = this.transformation();
-    if (!t?.comparison_image) return;
-    this.triggerDownload(t.comparison_image, `caraser-${t.id}-comparison.png`);
-  }
-
-  private triggerDownload(url: string, filename: string): void {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-  }
-
-  async share(): Promise<void> {
-    const t = this.transformation();
-    if (!t) return;
-    const shareUrl = `${location.origin}/t/${t.id}`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'Caraser – streets without cars', url: shareUrl });
-        return;
-      } catch {
-        // fall through to clipboard
-      }
-    }
-    await navigator.clipboard.writeText(shareUrl);
   }
 
   private currentOptions(): TransformationOptions {
@@ -188,7 +132,6 @@ export class HomeComponent {
         if (t.delete_token) {
           this.tokenService.save(t.id, t.delete_token);
         }
-        this.transformation.set(t);
         this.state.set('processing');
         this.startPolling(t.id);
       },
@@ -202,8 +145,9 @@ export class HomeComponent {
   private startPolling(id: string): void {
     this.service.poll(id).subscribe({
       next: (t) => {
-        this.transformation.set(t);
-        if (t.status === 'done') this.state.set('done');
+        if (t.status === 'done') {
+          this.router.navigate(['/t', id]);
+        }
         if (t.status === 'failed') {
           this.state.set('error');
           this.errorMessage.set(t.error || 'Processing failed.');

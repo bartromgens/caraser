@@ -138,28 +138,3 @@
   p { margin: 0; }
 }
 
-/* Result */
-.result {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.comparison-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-
-.result-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-
-  .delete-btn {
-    color: var(--mat-sys-error);
-    border-color: var(--mat-sys-error);
-    margin-left: auto;
-  }
-}
