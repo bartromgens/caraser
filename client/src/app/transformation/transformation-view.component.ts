@@ -105,8 +105,12 @@ export class TransformationViewComponent implements OnInit {
         if (err instanceof DOMException && err.name === 'AbortError') return;
       }
     }
+    await this.copyLink();
+  }
+
+  async copyLink(): Promise<void> {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(location.href);
       this.snackBar.open('Link copied to clipboard', undefined, { duration: 3000 });
     } catch {
       this.snackBar.open('Could not copy link', undefined, { duration: 3000 });
