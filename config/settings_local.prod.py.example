@@ -25,9 +25,3 @@ DATABASES = {
 # Gemini API key – get one at https://aistudio.google.com/app/apikey
 # You can also supply this via the GEMINI_API_KEY environment variable instead.
 GEMINI_API_KEY = ""
-
-# Google Maps API key – create one at https://console.cloud.google.com/google/maps-apis/
-# Enable these APIs on the key: Maps JavaScript API, Street View Static API,
-# Geocoding API, Places API.
-# Restrict the key to your domain (HTTP referrer) to prevent misuse.
-GOOGLE_MAPS_API_KEY = ""
