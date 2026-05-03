@@ -42,6 +42,7 @@ class TransformationAdmin(admin.ModelAdmin):
         "original_image",
         "result_image",
         "comparison_image",
+        "prompt",
         "created_at",
         "updated_at",
     )
@@ -79,6 +80,13 @@ class TransformationAdmin(admin.ModelAdmin):
                     "ground_cover",
                     "shape_style",
                 )
+            },
+        ),
+        (
+            "Prompt",
+            {
+                "fields": ("prompt",),
+                "classes": ("collapse",),
             },
         ),
         (

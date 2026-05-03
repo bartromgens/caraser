@@ -29,6 +29,7 @@ class Transformation(models.Model):
     comparison_image = models.ImageField(upload_to="comparisons/%Y/%m/%d/", blank=True, null=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     error = models.TextField(blank=True)
+    prompt = models.TextField(blank=True)
     is_public = models.BooleanField(default=True)
 
     allow_cars = models.BooleanField(default=False)

@@ -8,7 +8,7 @@ from django.core.files.base import ContentFile
 
 from .models import Transformation
 from .services.comparison import build_comparison_image
-from .services.gemini import PromptOptions, remove_cars
+from .services.gemini import PromptOptions, build_prompt, remove_cars
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,11 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
         name = transformation.original_image.name
         mime_type = "image/png" if name.lower().endswith(".png") else "image/jpeg"
 
-        result_bytes = _to_jpeg(remove_cars(image_bytes, mime_type, _options_from(transformation)))
+        prompt = build_prompt(_options_from(transformation))
+        transformation.prompt = prompt
+        transformation.save(update_fields=["prompt", "updated_at"])
+
+        result_bytes = _to_jpeg(remove_cars(image_bytes, mime_type, prompt=prompt))
         comparison_bytes = build_comparison_image(image_bytes, result_bytes)
 
         transformation.result_image.save(

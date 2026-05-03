@@ -139,8 +139,10 @@ def remove_cars(
     image_bytes: bytes,
     mime_type: str = "image/jpeg",
     options: PromptOptions | None = None,
+    prompt: str | None = None,
 ) -> bytes:
-    prompt = build_prompt(options or PromptOptions())
+    if prompt is None:
+        prompt = build_prompt(options or PromptOptions())
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
     response = client.models.generate_content(
         model=settings.GEMINI_MODEL,
