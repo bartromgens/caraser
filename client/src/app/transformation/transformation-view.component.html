@@ -25,9 +25,8 @@
     />
 
     <div class="view-actions">
-      <button mat-flat-button (click)="download()"><mat-icon>download</mat-icon> Download</button>
-      <button mat-stroked-button *ngIf="t.comparison_image" (click)="downloadComparison()">
-        <mat-icon>download</mat-icon> Download comparison
+      <button mat-flat-button (click)="t.comparison_image ? downloadComparison() : download()">
+        <mat-icon>download</mat-icon> Download
       </button>
       <button mat-stroked-button (click)="share()"><mat-icon>share</mat-icon> Share</button>
       <a mat-stroked-button routerLink="/">
