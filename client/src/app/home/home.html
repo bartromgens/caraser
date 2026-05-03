@@ -106,9 +106,18 @@
       afterLabel="After">
     </app-before-after-slider>
 
+    <img
+      *ngIf="transformation()!.comparison_image"
+      class="comparison-img"
+      [src]="transformation()!.comparison_image"
+      alt="Before and after comparison" />
+
     <div class="result-actions">
       <button mat-flat-button (click)="download()">
         <mat-icon>download</mat-icon> Download
+      </button>
+      <button mat-stroked-button *ngIf="transformation()!.comparison_image" (click)="downloadComparison()">
+        <mat-icon>download</mat-icon> Download comparison
       </button>
       <button mat-stroked-button (click)="share()">
         <mat-icon>share</mat-icon> Share

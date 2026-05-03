@@ -5,6 +5,7 @@ import uuid
 from django.core.files.base import ContentFile
 
 from .models import Transformation
+from .services.comparison import build_comparison_image
 from .services.gemini import PromptOptions, remove_cars
 
 logger = logging.getLogger(__name__)
@@ -38,11 +39,16 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
         mime_type = "image/png" if name.lower().endswith(".png") else "image/jpeg"
 
         result_bytes = remove_cars(image_bytes, mime_type, _options_from(transformation))
+        comparison_bytes = build_comparison_image(image_bytes, result_bytes)
 
-        filename = f"{transformation.pk}.png"
-        transformation.result_image.save(filename, ContentFile(result_bytes), save=False)
+        transformation.result_image.save(
+            f"{transformation.pk}.png", ContentFile(result_bytes), save=False
+        )
+        transformation.comparison_image.save(
+            f"{transformation.pk}-comparison.png", ContentFile(comparison_bytes), save=False
+        )
         transformation.status = Transformation.Status.DONE
-        transformation.save(update_fields=["result_image", "status", "updated_at"])
+        transformation.save(update_fields=["result_image", "comparison_image", "status", "updated_at"])
     except Exception as exc:
         logger.exception("Transformation %s failed", transformation_id)
         transformation.status = Transformation.Status.FAILED
