@@ -48,9 +48,19 @@ export class TransformationViewComponent implements OnInit {
   download(): void {
     const t = this.transformation();
     if (!t?.result_image) return;
+    this.triggerDownload(t.result_image, `caraser-${t.id}.png`);
+  }
+
+  downloadComparison(): void {
+    const t = this.transformation();
+    if (!t?.comparison_image) return;
+    this.triggerDownload(t.comparison_image, `caraser-${t.id}-comparison.png`);
+  }
+
+  private triggerDownload(url: string, filename: string): void {
     const a = document.createElement('a');
-    a.href = t.result_image;
-    a.download = `caraser-${t.id}.png`;
+    a.href = url;
+    a.download = filename;
     a.click();
   }
 

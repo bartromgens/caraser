@@ -37,35 +37,32 @@ def _draw_label(draw: ImageDraw.ImageDraw, text: str, x: int, y: int, font) -> N
     )
 
 
-def _crop_to_square(img: Image.Image) -> Image.Image:
-    side = min(img.width, img.height)
-    left = (img.width - side) // 2
-    top = (img.height - side) // 2
-    return img.crop((left, top, left + side, top + side))
+def _crop_to_panel(img: Image.Image, panel_w: int, panel_h: int) -> Image.Image:
+    """Centre-crop img to panel_w × panel_h, scaling down first if needed."""
+    # Scale so the image is at least panel_w wide and panel_h tall (cover fit).
+    scale = max(panel_w / img.width, panel_h / img.height)
+    if scale < 1.0:
+        img = img.resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS)
+    left = (img.width - panel_w) // 2
+    top = (img.height - panel_h) // 2
+    return img.crop((left, top, left + panel_w, top + panel_h))
 
 
 def build_comparison_image(before_bytes: bytes, after_bytes: bytes) -> bytes:
     before = Image.open(BytesIO(before_bytes)).convert("RGB")
     after = Image.open(BytesIO(after_bytes)).convert("RGB")
 
-    # Crop both images to square at the same relative position before stacking.
-    # The after image may differ in size from the original, so each is cropped
-    # independently (centre crop), then scaled to a common side length.
-    before = _crop_to_square(before)
-    after = _crop_to_square(after)
+    # Choose canvas side = narrowest image width (no upscaling).
+    canvas_side = min(before.width, after.width)
+    # Each panel fills exactly half the square canvas (minus the gap).
+    panel_w = canvas_side
+    panel_h = (canvas_side - _GAP) // 2
 
-    target_w = min(before.width, after.width)
-
-    def resize_to_width(img: Image.Image) -> Image.Image:
-        if img.width == target_w:
-            return img
-        return img.resize((target_w, target_w), Image.LANCZOS)
-
-    before = resize_to_width(before)
-    after = resize_to_width(after)
+    before = _crop_to_panel(before, panel_w, panel_h)
+    after = _crop_to_panel(after, panel_w, panel_h)
 
     total_h = before.height + _GAP + after.height
-    canvas = Image.new("RGB", (target_w, total_h), (30, 30, 30))
+    canvas = Image.new("RGB", (canvas_side, total_h), (30, 30, 30))
     canvas.paste(before, (0, 0))
     canvas.paste(after, (0, before.height + _GAP))
 
