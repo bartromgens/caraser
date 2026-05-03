@@ -18,6 +18,6 @@ alwaysApply: true
 
 ## Formatting
 
-- Formatting: Use Black for Python and Prettier for frontend.
+- Formatting: Use Black for Python and Prettier for TypeScript/Angular.
 - Linting: Use Flake8 for style and lint checks.
 - Type hints: Add type hints.

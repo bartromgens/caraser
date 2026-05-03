@@ -1,7 +1,9 @@
 import logging
 import threading
 import uuid
+from io import BytesIO
 
+from PIL import Image
 from django.core.files.base import ContentFile
 
 from .models import Transformation
@@ -12,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 # NOTE: This uses a simple daemon thread for MVP. For production, replace with
 # Celery + Redis or another task queue to survive server restarts and scale.
+
+
+def _to_jpeg(image_bytes: bytes, quality: int = 85) -> bytes:
+    buf = BytesIO()
+    Image.open(BytesIO(image_bytes)).convert("RGB").save(buf, format="JPEG", quality=quality)
+    return buf.getvalue()
 
 
 def _options_from(transformation: Transformation) -> PromptOptions:
@@ -38,14 +46,14 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
         name = transformation.original_image.name
         mime_type = "image/png" if name.lower().endswith(".png") else "image/jpeg"
 
-        result_bytes = remove_cars(image_bytes, mime_type, _options_from(transformation))
+        result_bytes = _to_jpeg(remove_cars(image_bytes, mime_type, _options_from(transformation)))
         comparison_bytes = build_comparison_image(image_bytes, result_bytes)
 
         transformation.result_image.save(
-            f"{transformation.pk}.png", ContentFile(result_bytes), save=False
+            f"{transformation.pk}.jpg", ContentFile(result_bytes), save=False
         )
         transformation.comparison_image.save(
-            f"{transformation.pk}-comparison.png", ContentFile(comparison_bytes), save=False
+            f"{transformation.pk}-comparison.jpg", ContentFile(comparison_bytes), save=False
         )
         transformation.status = Transformation.Status.DONE
         transformation.save(update_fields=["result_image", "comparison_image", "status", "updated_at"])

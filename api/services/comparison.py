@@ -77,5 +77,5 @@ def build_comparison_image(before_bytes: bytes, after_bytes: bytes) -> bytes:
     canvas = Image.alpha_composite(canvas, overlay)
 
     buf = BytesIO()
-    canvas.convert("RGB").save(buf, format="PNG", optimize=True)
+    canvas.convert("RGB").save(buf, format="JPEG", quality=85)
     return buf.getvalue()

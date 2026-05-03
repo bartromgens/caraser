@@ -39,7 +39,7 @@ class Command(BaseCommand):
 
                 comparison_bytes = build_comparison_image(before_bytes, after_bytes)
                 t.comparison_image.save(
-                    f"{t.pk}-comparison.png",
+                    f"{t.pk}-comparison.jpg",
                     ContentFile(comparison_bytes),
                     save=False,
                 )
