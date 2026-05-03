@@ -60,17 +60,6 @@
   gap: 20px 24px;
 }
 
-@media (max-width: 599px) {
-  mat-button-toggle-group {
-    display: flex !important;
-    flex-wrap: wrap;
-    width: 100%;
-  }
-
-  mat-button-toggle {
-    flex: 1 1 auto;
-  }
-}
 
 .option-row {
   display: flex;

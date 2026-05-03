@@ -79,16 +79,14 @@
 
           <div class="option-row">
             <label class="option-label">Design language</label>
-            <mat-button-toggle-group
-              [value]="shapeStyle()"
-              (change)="shapeStyle.set($event.value)"
-              aria-label="Shape style"
-            >
-              <mat-button-toggle value="organic">Organic</mat-button-toggle>
-              <mat-button-toggle value="straight">Straight lines</mat-button-toggle>
-              <mat-button-toggle value="formal">Formal</mat-button-toggle>
-              <mat-button-toggle value="wilderness">Wilderness</mat-button-toggle>
-            </mat-button-toggle-group>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-select [value]="shapeStyle()" (selectionChange)="shapeStyle.set($event.value)">
+                <mat-option value="organic">Organic</mat-option>
+                <mat-option value="straight">Straight lines</mat-option>
+                <mat-option value="formal">Formal</mat-option>
+                <mat-option value="wilderness">Wilderness</mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
         </div>
 
