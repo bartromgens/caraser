@@ -4,6 +4,7 @@ import { NgIf } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 
 import { TransformationService, Transformation } from '../core/transformation.service';
@@ -29,6 +30,7 @@ export class TransformationViewComponent implements OnInit {
   private readonly tokenService = inject(DeleteTokenService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly snackBar = inject(MatSnackBar);
 
   transformation = signal<Transformation | null>(null);
   loading = signal(true);
@@ -93,10 +95,15 @@ export class TransformationViewComponent implements OnInit {
       try {
         await navigator.share({ title: 'Caraser – streets without cars', url: shareUrl });
         return;
-      } catch {
-        // fall through
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
       }
     }
-    await navigator.clipboard.writeText(shareUrl);
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      this.snackBar.open('Link copied to clipboard', undefined, { duration: 3000 });
+    } catch {
+      this.snackBar.open('Could not copy link', undefined, { duration: 3000 });
+    }
   }
 }
