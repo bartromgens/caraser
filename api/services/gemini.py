@@ -36,6 +36,22 @@ _GROUND_COVER_LINE = {
 }
 
 
+_VEGETATION_LINE = {
+    Transformation.GroundCover.MIXED: (
+        "- Native trees and flowering shrubs rising above the ground cover"
+    ),
+    Transformation.GroundCover.STONES: (
+        "- Trees and low green accents planted between the paving stones"
+    ),
+    Transformation.GroundCover.GRASS: (
+        "- Scattered shade trees rising from the open grass — no flowering shrubs or planted beds"
+    ),
+    Transformation.GroundCover.FLOWERS: (
+        "- Native trees providing canopy above the flowering beds and wildflower plantings"
+    ),
+}
+
+
 _SHAPE_STYLE_LINE = {
     Transformation.ShapeStyle.MIXED: (
         "- Combine curved, flowing organic shapes with clean geometric straight "
@@ -105,12 +121,12 @@ def build_prompt(options: PromptOptions) -> str:
 
 {_surface_rules(options.fietsstraat)}REPLACE ONLY THE SPACE CURRENTLY OCCUPIED BY CARS AND ROAD MARKINGS WITH:
 {_GROUND_COVER_LINE[options.ground_cover]}
-- Native trees and flowering shrubs in generous planted beds
+{_VEGETATION_LINE[options.ground_cover]}
 - Pedestrian paths sized to the remaining space
 - Children playing freely in the open space
 - Adults sitting at café-style seating, talking and relaxing
 - Cyclists passing gently through
-- Birds perched in the trees, bees near the flowers
+- Birds perched in the trees{", bees near the flowers" if options.ground_cover in (Transformation.GroundCover.MIXED, Transformation.GroundCover.FLOWERS) else ""}
 
 DESIGN LANGUAGE:
 {_SHAPE_STYLE_LINE[options.shape_style]}
@@ -121,7 +137,6 @@ DO NOT CHANGE:
 - Existing lighting conditions and time of day
 - Camera angle and perspective
 - The total street width: the distance between the building faces (or kerbs) must stay exactly the same as in the input — do not widen or narrow the street corridor under any circumstances
-- Existing footpaths, pavements, and sidewalks — their width and position must remain unchanged
 - The spatial proportions of the scene; only the surface treatment and contents within the existing street boundary change
 
 SEASON: Always depict as spring or summer — regardless of the season visible in the input photo.
