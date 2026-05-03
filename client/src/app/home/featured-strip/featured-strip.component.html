@@ -1,0 +1,27 @@
+<section *ngIf="items().length > 0" class="featured-strip">
+  <div class="featured-strip__header">
+    <p class="featured-strip__title">From the community</p>
+    <a routerLink="/gallery" class="featured-strip__more">
+      See more <mat-icon inline>arrow_forward</mat-icon>
+    </a>
+  </div>
+
+  <div class="featured-strip__grid">
+    <a
+      *ngFor="let item of items()"
+      class="featured-card"
+      [routerLink]="['/t', item.id]"
+    >
+      <img
+        [src]="item.result_image"
+        [alt]="'Transformed street'"
+        class="featured-card__img"
+        loading="lazy"
+      />
+      <div class="featured-card__overlay">
+        <mat-icon>compare</mat-icon>
+        <span>View comparison</span>
+      </div>
+    </a>
+  </div>
+</section>

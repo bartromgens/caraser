@@ -10,6 +10,7 @@ _COMMON_FIELDS = [
     "status",
     "error",
     "is_public",
+    "is_featured",
     "allow_cars",
     "fietsstraat",
     "ground_cover",
@@ -17,7 +18,7 @@ _COMMON_FIELDS = [
     "created_at",
 ]
 
-_COMMON_READ_ONLY = ["id", "result_image", "comparison_image", "status", "error", "created_at"]
+_COMMON_READ_ONLY = ["id", "result_image", "comparison_image", "status", "error", "is_featured", "created_at"]
 
 
 class TransformationSerializer(serializers.ModelSerializer):

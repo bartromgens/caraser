@@ -20,6 +20,7 @@ export interface Transformation extends TransformationOptions {
   status: 'pending' | 'processing' | 'done' | 'failed';
   error: string;
   is_public: boolean;
+  is_featured: boolean;
   created_at: string;
   delete_token?: string;
 }
@@ -49,10 +50,14 @@ export class TransformationService {
     return this.http.get<Transformation>(`/api/transformations/${id}/`);
   }
 
-  list(page = 1): Observable<PaginatedTransformations> {
-    return this.http.get<PaginatedTransformations>('/api/transformations/', {
-      params: { page: page.toString() },
-    });
+  list(
+    page = 1,
+    opts: { featured?: boolean; pageSize?: number } = {},
+  ): Observable<PaginatedTransformations> {
+    const params: Record<string, string> = { page: page.toString() };
+    if (opts.featured) params['featured'] = 'true';
+    if (opts.pageSize) params['page_size'] = opts.pageSize.toString();
+    return this.http.get<PaginatedTransformations>('/api/transformations/', { params });
   }
 
   poll(id: string): Observable<Transformation> {

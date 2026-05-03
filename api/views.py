@@ -124,6 +124,8 @@ def transformation_list(request: Request) -> Response:
         status=Transformation.Status.DONE,
         is_public=True,
     )
+    if request.query_params.get("featured", "").lower() in _TRUTHY:
+        qs = qs.filter(is_featured=True)
     paginator = GalleryPagination()
     page = paginator.paginate_queryset(qs, request)
     serializer = TransformationSerializer(page, many=True, context={"request": request})

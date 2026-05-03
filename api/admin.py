@@ -9,6 +9,7 @@ class TransformationAdmin(admin.ModelAdmin):
         "id",
         "status",
         "is_public",
+        "is_featured",
         "allow_cars",
         "fietsstraat",
         "ground_cover",
@@ -19,12 +20,22 @@ class TransformationAdmin(admin.ModelAdmin):
     list_filter = (
         "status",
         "is_public",
+        "is_featured",
         "allow_cars",
         "fietsstraat",
         "ground_cover",
         "shape_style",
         "created_at",
     )
+    actions = ["mark_featured", "unmark_featured"]
+
+    @admin.action(description="Mark selected as featured")
+    def mark_featured(self, request, queryset):
+        queryset.update(is_featured=True)
+
+    @admin.action(description="Unmark selected as featured")
+    def unmark_featured(self, request, queryset):
+        queryset.update(is_featured=False)
     search_fields = ("id", "error")
     readonly_fields = (
         "id",
@@ -45,6 +56,7 @@ class TransformationAdmin(admin.ModelAdmin):
                     "status",
                     "error",
                     "is_public",
+                    "is_featured",
                 )
             },
         ),

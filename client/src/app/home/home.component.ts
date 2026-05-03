@@ -16,6 +16,7 @@ import {
   TransformationService,
 } from '../core/transformation.service';
 import { DeleteTokenService } from '../core/delete-token.service';
+import { FeaturedStripComponent } from './featured-strip/featured-strip.component';
 
 type AppState = 'upload' | 'options' | 'uploading' | 'processing' | 'error';
 
@@ -39,6 +40,7 @@ const DEFAULT_OPTIONS: TransformationOptions = {
     MatProgressBarModule,
     MatSelectModule,
     MatSlideToggleModule,
+    FeaturedStripComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',

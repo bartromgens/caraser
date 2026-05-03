@@ -40,6 +40,8 @@ class Transformation(models.Model):
         max_length=16, choices=ShapeStyle.choices, default=ShapeStyle.ORGANIC
     )
 
+    is_featured = models.BooleanField(default=False, db_index=True)
+
     delete_token = models.CharField(max_length=64, default=secrets.token_urlsafe, editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
