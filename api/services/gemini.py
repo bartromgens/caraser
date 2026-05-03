@@ -133,8 +133,6 @@ DESIGN LANGUAGE:
 
 DO NOT CHANGE:
 - Buildings, architectural facades, windows, doors, and signage
-- The sky and upper atmosphere
-- Existing lighting conditions and time of day
 - Camera angle and perspective
 - The total street width: the distance between the building faces (or kerbs) must stay exactly the same as in the input — do not widen or narrow the street corridor under any circumstances
 - The spatial proportions of the scene; only the surface treatment and contents within the existing street boundary change
