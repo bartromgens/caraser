@@ -20,6 +20,8 @@ class Transformation(models.Model):
     class ShapeStyle(models.TextChoices):
         ORGANIC = "organic", "Organic"
         STRAIGHT = "straight", "Straight"
+        FORMAL = "formal", "Formal"
+        WILDERNESS = "wilderness", "Wilderness"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     original_image = models.ImageField(upload_to="originals/%Y/%m/%d/")

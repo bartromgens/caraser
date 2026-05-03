@@ -45,6 +45,16 @@ _SHAPE_STYLE_LINE = {
         "- Use clean geometric straight lines and rectangular forms for paths and planted "
         "beds; structured and orderly layout"
     ),
+    Transformation.ShapeStyle.FORMAL: (
+        "- Use a strictly symmetrical, axial layout with mirrored planting beds and a "
+        "central path; classical formal garden arrangement with clipped hedges and "
+        "matching tree rows on each side"
+    ),
+    Transformation.ShapeStyle.WILDERNESS: (
+        "- Use dense, unstructured naturalistic planting with no defined hard edges; "
+        "a rewilded meadow aesthetic with tall grasses, wildflowers, and self-seeding "
+        "plants — minimal paving, maximum biodiversity"
+    ),
 }
 
 
