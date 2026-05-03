@@ -117,7 +117,12 @@ def _handle_delete(request: Request, transformation: Transformation) -> Response
     if not secrets.compare_digest(token, transformation.delete_token):
         return Response({"detail": "Invalid delete token."}, status=status.HTTP_403_FORBIDDEN)
 
-    for field in (transformation.original_image, transformation.result_image, transformation.comparison_image):
+    for field in (
+        transformation.original_image,
+        transformation.result_image,
+        transformation.thumbnail_image,
+        transformation.comparison_image,
+    ):
         if field:
             field.delete(save=False)
     transformation.delete()

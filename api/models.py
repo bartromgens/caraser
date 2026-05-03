@@ -26,6 +26,7 @@ class Transformation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     original_image = models.ImageField(upload_to="originals/%Y/%m/%d/")
     result_image = models.ImageField(upload_to="results/%Y/%m/%d/", blank=True, null=True)
+    thumbnail_image = models.ImageField(upload_to="thumbnails/%Y/%m/%d/", blank=True, null=True)
     comparison_image = models.ImageField(upload_to="comparisons/%Y/%m/%d/", blank=True, null=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     error = models.TextField(blank=True)

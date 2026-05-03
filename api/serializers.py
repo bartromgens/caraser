@@ -6,6 +6,7 @@ _COMMON_FIELDS = [
     "id",
     "original_image",
     "result_image",
+    "thumbnail_image",
     "comparison_image",
     "status",
     "error",
@@ -18,12 +19,22 @@ _COMMON_FIELDS = [
     "created_at",
 ]
 
-_COMMON_READ_ONLY = ["id", "result_image", "comparison_image", "status", "error", "is_featured", "created_at"]
+_COMMON_READ_ONLY = [
+    "id",
+    "result_image",
+    "thumbnail_image",
+    "comparison_image",
+    "status",
+    "error",
+    "is_featured",
+    "created_at",
+]
 
 
 class TransformationSerializer(serializers.ModelSerializer):
     original_image = serializers.ImageField(use_url=True)
     result_image = serializers.ImageField(use_url=True, allow_null=True, read_only=True)
+    thumbnail_image = serializers.ImageField(use_url=True, allow_null=True, read_only=True)
     comparison_image = serializers.ImageField(use_url=True, allow_null=True, read_only=True)
 
     class Meta:

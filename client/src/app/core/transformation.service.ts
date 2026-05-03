@@ -16,6 +16,7 @@ export interface Transformation extends TransformationOptions {
   id: string;
   original_image: string;
   result_image: string | null;
+  thumbnail_image: string | null;
   comparison_image: string | null;
   status: 'pending' | 'processing' | 'done' | 'failed';
   error: string;

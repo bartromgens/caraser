@@ -13,7 +13,7 @@
       [routerLink]="['/t', item.id]"
     >
       <img
-        [src]="item.result_image"
+        [src]="item.thumbnail_image || item.result_image"
         [alt]="'Transformed street'"
         class="featured-card__img"
         [loading]="i === 0 ? 'eager' : 'lazy'"

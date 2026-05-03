@@ -16,9 +16,22 @@ logger = logging.getLogger(__name__)
 # Celery + Redis or another task queue to survive server restarts and scale.
 
 
+THUMBNAIL_WIDTH = 600
+
+
 def _to_jpeg(image_bytes: bytes, quality: int = 85) -> bytes:
     buf = BytesIO()
     Image.open(BytesIO(image_bytes)).convert("RGB").save(buf, format="JPEG", quality=quality)
+    return buf.getvalue()
+
+
+def _to_thumbnail(image_bytes: bytes, width: int = THUMBNAIL_WIDTH, quality: int = 80) -> bytes:
+    img = Image.open(BytesIO(image_bytes)).convert("RGB")
+    if img.width > width:
+        height = int(img.height * width / img.width)
+        img = img.resize((width, height), Image.LANCZOS)
+    buf = BytesIO()
+    img.save(buf, format="JPEG", quality=quality)
     return buf.getvalue()
 
 
@@ -49,16 +62,22 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
         transformation.save(update_fields=["prompt", "updated_at"])
 
         result_bytes = _to_jpeg(remove_cars(image_bytes, prompt=prompt))
+        thumbnail_bytes = _to_thumbnail(result_bytes)
         comparison_bytes = build_comparison_image(image_bytes, result_bytes)
 
         transformation.result_image.save(
             f"{transformation.pk}.jpg", ContentFile(result_bytes), save=False
         )
+        transformation.thumbnail_image.save(
+            f"{transformation.pk}-thumb.jpg", ContentFile(thumbnail_bytes), save=False
+        )
         transformation.comparison_image.save(
             f"{transformation.pk}-comparison.jpg", ContentFile(comparison_bytes), save=False
         )
         transformation.status = Transformation.Status.DONE
-        transformation.save(update_fields=["result_image", "comparison_image", "status", "updated_at"])
+        transformation.save(
+            update_fields=["result_image", "thumbnail_image", "comparison_image", "status", "updated_at"]
+        )
     except Exception as exc:
         logger.exception("Transformation %s failed", transformation_id)
         transformation.status = Transformation.Status.FAILED
