@@ -1,5 +1,4 @@
 <div class="home-container">
-
   <!-- IDLE: options + drop zone -->
   <ng-container *ngIf="state() === 'idle'">
     <mat-card class="options-card">
@@ -7,7 +6,9 @@
         <div class="options-header">
           <div>
             <p class="options-title">Style options</p>
-            <p class="options-sub">Defaults already give a nice result — tweak anything you like.</p>
+            <p class="options-sub">
+              Defaults already give a nice result — tweak anything you like.
+            </p>
           </div>
           <button mat-button type="button" class="options-reset" (click)="resetOptions()">
             <mat-icon>restart_alt</mat-icon> Reset
@@ -26,7 +27,9 @@
             <mat-slide-toggle [checked]="fietsstraat()" (change)="fietsstraat.set($event.checked)">
               Fietsstraat (red asphalt)
             </mat-slide-toggle>
-            <p class="option-hint">Dutch bicycle street with deep red asphalt as the main surface.</p>
+            <p class="option-hint">
+              Dutch bicycle street with deep red asphalt as the main surface.
+            </p>
           </div>
 
           <div class="option-row">
@@ -46,7 +49,8 @@
             <mat-button-toggle-group
               [value]="shapeStyle()"
               (change)="shapeStyle.set($event.value)"
-              aria-label="Shape style">
+              aria-label="Shape style"
+            >
               <mat-button-toggle value="organic">Organic</mat-button-toggle>
               <mat-button-toggle value="straight">Straight lines</mat-button-toggle>
             </mat-button-toggle-group>
@@ -55,27 +59,38 @@
       </mat-card-content>
     </mat-card>
 
-    <div class="dropzone"
-         [ngClass]="{ 'dropzone--active': isDragOver() }"
-         (dragover)="onDragOver($event)"
-         (dragleave)="onDragLeave()"
-         (drop)="onDrop($event)">
+    <div
+      class="dropzone"
+      [ngClass]="{ 'dropzone--active': isDragOver() }"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)"
+    >
       <mat-icon class="dropzone__icon">add_photo_alternate</mat-icon>
       <p class="dropzone__heading">Upload a street photo</p>
       <p class="dropzone__sub">Drag &amp; drop or click to browse</p>
       <button mat-flat-button (click)="fileInput.click()">
         <mat-icon>upload</mat-icon> Choose file
       </button>
-      <input #fileInput type="file" accept="image/jpeg,image/png,image/webp"
-             style="display:none" (change)="onFileSelected($event)" />
+      <input
+        #fileInput
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        style="display: none"
+        (change)="onFileSelected($event)"
+      />
       <p class="dropzone__hint">JPEG · PNG · WebP · max 20 MB</p>
     </div>
-
   </ng-container>
 
   <!-- WORKING: progress -->
   <div *ngIf="isWorking" class="progress-card">
-    <img *ngIf="previewUrl()" [src]="previewUrl()" class="preview-img" alt="Uploaded street photo" />
+    <img
+      *ngIf="previewUrl()"
+      [src]="previewUrl()"
+      class="preview-img"
+      alt="Uploaded street photo"
+    />
     <div class="progress-info">
       <p class="progress-label">{{ statusLabel }}</p>
       <mat-progress-bar [mode]="progressMode"></mat-progress-bar>
@@ -91,10 +106,7 @@
       </div>
     </mat-card-content>
     <mat-card-actions>
-      <button mat-flat-button (click)="reset()">
-        <mat-icon>refresh</mat-icon> Try again
-      </button>
+      <button mat-flat-button (click)="reset()"><mat-icon>refresh</mat-icon> Try again</button>
     </mat-card-actions>
   </mat-card>
-
 </div>

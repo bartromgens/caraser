@@ -21,7 +21,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatButtonModule,
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class App {
   protected readonly title = 'Caraser';
@@ -29,8 +29,8 @@ export class App {
   private readonly breakpointObserver = inject(BreakpointObserver);
 
   protected readonly isHandset = toSignal(
-    this.breakpointObserver.observe('(max-width: 959.98px)').pipe(map(r => r.matches)),
-    { initialValue: false }
+    this.breakpointObserver.observe('(max-width: 959.98px)').pipe(map((r) => r.matches)),
+    { initialValue: false },
   );
 
   protected readonly sidenavOpened = signal(false);

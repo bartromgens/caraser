@@ -1,5 +1,4 @@
 <div class="view-container">
-
   <div *ngIf="loading()" class="spinner-wrap">
     <mat-spinner diameter="48"></mat-spinner>
   </div>
@@ -14,35 +13,35 @@
       [beforeUrl]="t.original_image"
       [afterUrl]="t.result_image!"
       beforeLabel="Before"
-      afterLabel="After">
+      afterLabel="After"
+    >
     </app-before-after-slider>
 
     <img
       *ngIf="t.comparison_image"
       class="comparison-img"
       [src]="t.comparison_image"
-      alt="Before and after comparison" />
+      alt="Before and after comparison"
+    />
 
     <div class="view-actions">
-      <button mat-flat-button (click)="download()">
-        <mat-icon>download</mat-icon> Download
-      </button>
+      <button mat-flat-button (click)="download()"><mat-icon>download</mat-icon> Download</button>
       <button mat-stroked-button *ngIf="t.comparison_image" (click)="downloadComparison()">
         <mat-icon>download</mat-icon> Download comparison
       </button>
-      <button mat-stroked-button (click)="share()">
-        <mat-icon>share</mat-icon> Share
-      </button>
+      <button mat-stroked-button (click)="share()"><mat-icon>share</mat-icon> Share</button>
       <a mat-stroked-button routerLink="/">
         <mat-icon>add_photo_alternate</mat-icon> Try your own
       </a>
-      <a mat-stroked-button routerLink="/gallery">
-        <mat-icon>grid_view</mat-icon> Gallery
-      </a>
-      <button mat-stroked-button class="delete-btn" *ngIf="canDelete()" (click)="deleteTransformation()">
+      <a mat-stroked-button routerLink="/gallery"> <mat-icon>grid_view</mat-icon> Gallery </a>
+      <button
+        mat-stroked-button
+        class="delete-btn"
+        *ngIf="canDelete()"
+        (click)="deleteTransformation()"
+      >
         <mat-icon>delete</mat-icon> Delete
       </button>
     </div>
   </ng-container>
-
 </div>

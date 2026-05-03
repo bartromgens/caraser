@@ -69,7 +69,9 @@
   border: 2px dashed var(--mat-sys-outline);
   border-radius: 12px;
   text-align: center;
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
   cursor: pointer;
 
   &--active {
@@ -135,6 +137,7 @@
     align-items: center;
     gap: 12px;
   }
-  p { margin: 0; }
+  p {
+    margin: 0;
+  }
 }
-

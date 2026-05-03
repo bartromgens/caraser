@@ -13,11 +13,7 @@
   </p>
 
   <div class="gallery-grid">
-    <a
-      *ngFor="let item of items()"
-      class="gallery-card"
-      [routerLink]="['/t', item.id]"
-    >
+    <a *ngFor="let item of items()" class="gallery-card" [routerLink]="['/t', item.id]">
       <img
         [src]="item.result_image"
         [alt]="'Transformed street ' + item.id"

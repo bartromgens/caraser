@@ -5,8 +5,7 @@ export const routes: Routes = [
   { path: '', component: HomeComponent },
   {
     path: 'gallery',
-    loadComponent: () =>
-      import('./gallery/gallery.component').then((m) => m.GalleryComponent),
+    loadComponent: () => import('./gallery/gallery.component').then((m) => m.GalleryComponent),
   },
   {
     path: 't/:id',
