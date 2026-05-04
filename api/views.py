@@ -16,6 +16,7 @@ from .tasks import start_processing
 
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20 MB
 ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
+MAX_IMAGE_SIDE = 1536  # px — generous headroom above the 1 K Gemini output
 
 _TRUTHY = {"true", "1", "yes", "on"}
 
@@ -25,7 +26,10 @@ def _to_jpeg_upload(file) -> InMemoryUploadedFile:
     img = Image.open(file)
     # Honor EXIF orientation (e.g. portrait photos from phones) before stripping metadata.
     img = ImageOps.exif_transpose(img)
-    img.convert("RGB").save(buf, format="JPEG", quality=85)
+    img = img.convert("RGB")
+    if max(img.width, img.height) > MAX_IMAGE_SIDE:
+        img = ImageOps.contain(img, (MAX_IMAGE_SIDE, MAX_IMAGE_SIDE), Image.LANCZOS)
+    img.save(buf, format="JPEG", quality=85)
     buf.seek(0)
     stem = file.name.rsplit(".", 1)[0] if "." in file.name else file.name
     size = len(buf.getvalue())
