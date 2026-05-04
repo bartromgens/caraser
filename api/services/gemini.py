@@ -88,10 +88,10 @@ def _vehicle_rules(allow_cars: bool) -> str:
         )
     return (
         "REMOVE (mandatory — zero exceptions):\n"
-        "- Every single motor vehicle without exception: cars, trucks, vans, buses, "
-        "motorcycles — whether parked, moving, partially visible, or in the background\n"
-        "- Parking lanes, kerb markings, and road surface markings\n"
-        "- There must be absolutely no vehicles of any kind visible anywhere in the final image"
+        "- Remove every single motor vehicle\n"
+        "- Remove parking lanes, kerb markings, and road surface markings\n"
+        "- There must be absolutely no vehicles of any kind visible\n"
+        "- Remove traffic signs"
     )
 
 
@@ -115,37 +115,38 @@ def build_prompt(options: PromptOptions) -> str:
         else "car-free public space"
     )
 
-    return f"""Edit this street photo into a {headline}. Keep the same camera angle, lighting, and time of day throughout.
+    return f"""Edit this street photo into a {headline}. Keep the same camera angle.
 
 {_vehicle_rules(options.allow_cars)}
 
-{_surface_rules(options.fietsstraat)}REPLACE ONLY THE SPACE CURRENTLY OCCUPIED BY CARS AND ROAD MARKINGS WITH:
+{_surface_rules(options.fietsstraat)}REPLACE THE SPACE WITH:
 {_GROUND_COVER_LINE[options.ground_cover]}
 {_VEGETATION_LINE[options.ground_cover]}
 - Pedestrian paths sized to the remaining space
 - Children playing freely in the open space
 - Adults sitting at café-style seating, talking and relaxing
+- Benches integrated along the street, with people sitting on them
 - Cyclists passing gently through
-- Birds perched in the trees{", bees near the flowers" if options.ground_cover in (Transformation.GroundCover.MIXED, Transformation.GroundCover.FLOWERS) else ""}
+- Birds in the sky{", butterflies near the flowers" if options.ground_cover in (Transformation.GroundCover.MIXED, Transformation.GroundCover.FLOWERS) else ""}
 
 DESIGN LANGUAGE:
 {_SHAPE_STYLE_LINE[options.shape_style]}
 
-DO NOT CHANGE:
+KEEP THE FOLLOWING AS IS:
 - Buildings, architectural facades, windows, doors, and signage
 - Camera angle and perspective
-- The total street width: the distance between the building faces (or kerbs) must stay exactly the same as in the input — do not widen or narrow the street corridor under any circumstances
-- The spatial proportions of the scene; only the surface treatment and contents within the existing street boundary change
+- The total street width: do not widen or narrow the street corridor under any circumstances
+- The spatial proportions of the scene; 
 
-SEASON: Always depict as spring or summer — regardless of the season visible in the input photo.
-- All trees must be in full leaf — no bare or leafless branches
-- If the input shows winter or autumn, transform it into a warm, sunny day with lush green foliage
+SEASON: Always depict as spring or summer.
+- All trees must be in full leaf
+- Transform it into a warm, sunny day with lush green foliage
+- Change the time of day to a sunny afternoon with blue sky
 
 MOOD: Warm, lively, and human-scaled — like a thriving European pedestrian square on a sunny afternoon.
 
-STYLE: Photorealistic architectural visualization, natural daylight, high detail, no HDR over-processing.
-
-Output only the edited photo."""
+STYLE: Photorealistic, natural daylight, high detail, no HDR over-processing.
+"""
 
 
 def remove_cars(
