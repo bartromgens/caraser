@@ -1,7 +1,7 @@
 import secrets
 from io import BytesIO
 
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
@@ -22,7 +22,10 @@ _TRUTHY = {"true", "1", "yes", "on"}
 
 def _to_jpeg_upload(file) -> InMemoryUploadedFile:
     buf = BytesIO()
-    Image.open(file).convert("RGB").save(buf, format="JPEG", quality=85)
+    img = Image.open(file)
+    # Honor EXIF orientation (e.g. portrait photos from phones) before stripping metadata.
+    img = ImageOps.exif_transpose(img)
+    img.convert("RGB").save(buf, format="JPEG", quality=85)
     buf.seek(0)
     stem = file.name.rsplit(".", 1)[0] if "." in file.name else file.name
     size = len(buf.getvalue())
@@ -79,7 +82,9 @@ def _extract_options(request: Request) -> dict:
 def transformation_create(request: Request) -> Response:
     file = request.FILES.get("image")
     if file is None:
-        return Response({"detail": "No image file provided."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"detail": "No image file provided."}, status=status.HTTP_400_BAD_REQUEST
+        )
 
     error = _validate_image(file)
     if error:
@@ -92,7 +97,9 @@ def transformation_create(request: Request) -> Response:
     )
     start_processing(transformation.pk)
 
-    serializer = TransformationCreateSerializer(transformation, context={"request": request})
+    serializer = TransformationCreateSerializer(
+        transformation, context={"request": request}
+    )
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
@@ -113,9 +120,13 @@ def transformation_detail(request: Request, pk: str) -> Response:
 def _handle_delete(request: Request, transformation: Transformation) -> Response:
     token = request.headers.get("X-Delete-Token", "")
     if not token:
-        return Response({"detail": "Delete token required."}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(
+            {"detail": "Delete token required."}, status=status.HTTP_401_UNAUTHORIZED
+        )
     if not secrets.compare_digest(token, transformation.delete_token):
-        return Response({"detail": "Invalid delete token."}, status=status.HTTP_403_FORBIDDEN)
+        return Response(
+            {"detail": "Invalid delete token."}, status=status.HTTP_403_FORBIDDEN
+        )
 
     for field in (
         transformation.original_image,
