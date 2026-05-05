@@ -53,11 +53,13 @@ export class TransformationService {
 
   list(
     page = 1,
-    opts: { featured?: boolean; pageSize?: number } = {},
+    opts: { featured?: boolean | 'exclude'; pageSize?: number; ids?: string[] } = {},
   ): Observable<PaginatedTransformations> {
     const params: Record<string, string> = { page: page.toString() };
-    if (opts.featured) params['featured'] = 'true';
+    if (opts.featured === true) params['featured'] = 'true';
+    else if (opts.featured === 'exclude') params['featured'] = 'false';
     if (opts.pageSize) params['page_size'] = opts.pageSize.toString();
+    if (opts.ids?.length) params['ids'] = opts.ids.join(',');
     return this.http.get<PaginatedTransformations>('/api/transformations/', { params });
   }
 

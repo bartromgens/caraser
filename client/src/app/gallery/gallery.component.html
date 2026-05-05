@@ -2,29 +2,61 @@
   <h1 class="gallery-title">Community Gallery</h1>
   <p class="gallery-sub">Streets reclaimed — before &amp; after</p>
 
-  <div *ngIf="loading() && items().length === 0" class="spinner-wrap">
-    <mat-spinner diameter="48"></mat-spinner>
-  </div>
-
   <p *ngIf="error()" class="error-msg">{{ error() }}</p>
 
-  <p *ngIf="!loading() && items().length === 0 && !error()" class="empty-msg">
-    No transformations yet. <a routerLink="/">Be the first to upload!</a>
-  </p>
+  <section *ngIf="userItems().length > 0" class="gallery-section">
+    <h2 class="gallery-section__title">Your gallery</h2>
+    <div class="gallery-grid">
+      <app-gallery-card
+        *ngFor="let item of userItems(); let i = index"
+        [src]="item.thumbnail_image || item.result_image"
+        [alt]="'Transformed street ' + item.id"
+        [itemId]="item.id"
+        [imgLoading]="i === 0 ? 'eager' : 'lazy'"
+      />
+    </div>
+  </section>
 
-  <div class="gallery-grid">
-    <app-gallery-card
-      *ngFor="let item of items(); let i = index"
-      [src]="item.thumbnail_image || item.result_image"
-      [alt]="'Transformed street ' + item.id"
-      [itemId]="item.id"
-      [imgLoading]="i === 0 ? 'eager' : 'lazy'"
-    />
-  </div>
+  <section *ngIf="featuredItems().length > 0" class="gallery-section">
+    <h2 class="gallery-section__title">Featured</h2>
+    <div class="gallery-grid">
+      <app-gallery-card
+        *ngFor="let item of featuredItems(); let i = index"
+        [src]="item.thumbnail_image || item.result_image"
+        [alt]="'Transformed street ' + item.id"
+        [itemId]="item.id"
+        [imgLoading]="userItems().length === 0 && i === 0 ? 'eager' : 'lazy'"
+      />
+    </div>
+  </section>
 
-  <div *ngIf="hasNext()" class="load-more">
-    <button mat-stroked-button (click)="loadMore()" [disabled]="loading()">
-      <mat-icon>expand_more</mat-icon> Load more
-    </button>
-  </div>
+  <section class="gallery-section">
+    <h2 class="gallery-section__title">Community</h2>
+
+    <div *ngIf="loading() && items().length === 0" class="spinner-wrap">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+
+    <p *ngIf="!loading() && items().length === 0 && !error()" class="empty-msg">
+      No transformations yet. <a routerLink="/">Be the first to upload!</a>
+    </p>
+
+    <div class="gallery-grid">
+      <app-gallery-card
+        *ngFor="let item of items(); let i = index"
+        [src]="item.thumbnail_image || item.result_image"
+        [alt]="'Transformed street ' + item.id"
+        [itemId]="item.id"
+        [imgLoading]="
+          userItems().length === 0 && featuredItems().length === 0 && i === 0 ? 'eager' : 'lazy'
+        "
+      />
+    </div>
+
+    <div *ngIf="hasNext()" class="load-more">
+      <button mat-stroked-button (click)="loadMore()" [disabled]="loading()">
+        <mat-icon>expand_more</mat-icon> Load more
+      </button>
+    </div>
+  </section>
 </div>

@@ -5,6 +5,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 
 import { TransformationService, Transformation } from '../core/transformation.service';
+import { DeleteTokenService } from '../core/delete-token.service';
 import { SeoService } from '../core/seo.service';
 import { TrackingService } from '../core/tracking.service';
 import { GalleryCardComponent } from '../shared/gallery-card/gallery-card.component';
@@ -25,9 +26,12 @@ import { GalleryCardComponent } from '../shared/gallery-card/gallery-card.compon
 })
 export class GalleryComponent implements OnInit {
   private readonly service = inject(TransformationService);
+  private readonly tokenService = inject(DeleteTokenService);
   private readonly seo = inject(SeoService);
   private readonly tracking = inject(TrackingService);
 
+  userItems = signal<Transformation[]>([]);
+  featuredItems = signal<Transformation[]>([]);
   items = signal<Transformation[]>([]);
   loading = signal(true);
   error = signal('');
@@ -40,6 +44,20 @@ export class GalleryComponent implements OnInit {
       description:
         'Browse street photos transformed by Caraser – see what these spaces look like without cars.',
     });
+
+    const userIds = this.tokenService.ids();
+    if (userIds.length > 0) {
+      this.service.list(1, { ids: userIds }).subscribe({
+        next: (res) => this.userItems.set(res.results),
+        error: () => {},
+      });
+    }
+
+    this.service.list(1, { featured: true, pageSize: 12 }).subscribe({
+      next: (res) => this.featuredItems.set(res.results),
+      error: () => {},
+    });
+
     this.load();
   }
 
@@ -51,7 +69,7 @@ export class GalleryComponent implements OnInit {
 
   private load(append = false): void {
     this.loading.set(true);
-    this.service.list(this.page()).subscribe({
+    this.service.list(this.page(), { featured: 'exclude' }).subscribe({
       next: (res) => {
         this.items.update((prev) => (append ? [...prev, ...res.results] : res.results));
         this.hasNext.set(!!res.next);

@@ -19,6 +19,7 @@ ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_IMAGE_SIDE = 1536  # px — generous headroom above the 1 K Gemini output
 
 _TRUTHY = {"true", "1", "yes", "on"}
+_FALSY = {"false", "0", "no", "off"}
 
 
 def _to_jpeg_upload(file) -> InMemoryUploadedFile:
@@ -152,12 +153,22 @@ class GalleryPagination(PageNumberPagination):
 
 @api_view(["GET"])
 def transformation_list(request: Request) -> Response:
-    qs = Transformation.objects.filter(
-        status=Transformation.Status.DONE,
-        is_public=True,
-    )
-    if request.query_params.get("featured", "").lower() in _TRUTHY:
-        qs = qs.filter(is_featured=True)
+    ids_param = request.query_params.get("ids", "")
+    if ids_param:
+        ids = [s.strip() for s in ids_param.split(",") if s.strip()]
+        qs = Transformation.objects.filter(
+            id__in=ids, status=Transformation.Status.DONE
+        )
+    else:
+        qs = Transformation.objects.filter(
+            status=Transformation.Status.DONE,
+            is_public=True,
+        )
+        featured = request.query_params.get("featured", "").lower()
+        if featured in _TRUTHY:
+            qs = qs.filter(is_featured=True)
+        elif featured in _FALSY:
+            qs = qs.filter(is_featured=False)
     paginator = GalleryPagination()
     page = paginator.paginate_queryset(qs, request)
     serializer = TransformationSerializer(page, many=True, context={"request": request})

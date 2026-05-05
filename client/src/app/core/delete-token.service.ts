@@ -30,6 +30,10 @@ export class DeleteTokenService {
     return id in this.load();
   }
 
+  ids(): string[] {
+    return Object.keys(this.load());
+  }
+
   remove(id: string): void {
     const map = this.load();
     delete map[id];

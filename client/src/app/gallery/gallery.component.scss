@@ -42,6 +42,19 @@
   }
 }
 
+.gallery-section {
+  margin-bottom: 48px;
+
+  &__title {
+    margin: 0 0 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--mat-sys-on-surface-variant);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
 .gallery-grid {
   display: grid;
   grid-template-columns: 1fr;
