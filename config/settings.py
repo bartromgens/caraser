@@ -60,7 +60,9 @@ DATABASES = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -82,6 +84,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 GEMINI_API_KEY: str = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_MODEL: str = "gemini-2.5-flash-image"
 GEMINI_IMAGE_SIZE: str = "1K"  # "512", "1K", "2K", or "4K"
+
+# URL used by the OG-meta shim to fetch the Angular shell HTML.
+# In production the "client" Docker service is reachable on the default compose network.
+# Override in settings_local.py for development.
+CLIENT_SHELL_URL: str = "http://client/index.html"
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
