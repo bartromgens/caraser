@@ -79,9 +79,13 @@ def _vehicle_rules(allow_cars: bool) -> str:
         return (
             "VEHICLES:\n"
             "- Remove every parked motor vehicle without exception\n"
-            "- Leave a single narrow shared lane so the occasional car can still pass "
-            "through slowly (woonerf-style shared space)\n"
-            "- Remove parking lanes, kerb markings, and road surface markings that "
+            "- Narrow the drivable carriageway to one single minimal lane — only wide "
+            "enough for one slow car to pass (roughly the width of one car); do NOT "
+            "show a full-width or two-lane road\n"
+            "- Reclaim all freed-up road surface (former parking lanes and extra "
+            "carriageway width) and convert it into planted beds, trees, and pedestrian "
+            "space as described in the REPLACE THE SPACE WITH section\n"
+            "- Remove all parking lanes, kerb markings, and road surface markings that "
             "emphasise car dominance\n"
             "- The street must read as a calmed, pedestrian-first shared space — not a "
             "traditional road"
@@ -135,8 +139,8 @@ DESIGN LANGUAGE:
 KEEP THE FOLLOWING AS IS:
 - Buildings, architectural facades, windows, doors, and signage
 - Camera angle and perspective
-- The total street width: do not widen or narrow the street corridor under any circumstances
-- The spatial proportions of the scene; 
+- The total street corridor width from building facade to building facade — do not widen or narrow the space between buildings (only the drivable carriageway within it may be narrowed when cars are allowed)
+- The spatial proportions of the scene;
 
 SEASON: Always depict as spring or summer.
 - All trees must be in full leaf

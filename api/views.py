@@ -166,7 +166,7 @@ def transformation_list(request: Request) -> Response:
         )
         featured = request.query_params.get("featured", "").lower()
         if featured in _TRUTHY:
-            qs = qs.filter(is_featured=True)
+            qs = qs.filter(is_featured=True).order_by("?")
         elif featured in _FALSY:
             qs = qs.filter(is_featured=False)
     paginator = GalleryPagination()
