@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXsrfConfiguration } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideMatomo, withRouter } from 'ngx-matomo-client';
 
@@ -11,7 +11,9 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(),
+    provideHttpClient(
+      withXsrfConfiguration({ cookieName: 'csrftoken', headerName: 'X-CSRFToken' }),
+    ),
     provideAnimationsAsync(),
     ...(environment.matomo.enabled
       ? [

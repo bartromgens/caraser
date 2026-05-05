@@ -3,6 +3,7 @@ from io import BytesIO
 
 from PIL import Image, ImageOps, UnidentifiedImageError
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser
@@ -82,6 +83,7 @@ def _extract_options(request: Request) -> dict:
     }
 
 
+@csrf_protect
 @api_view(["POST"])
 @parser_classes([MultiPartParser])
 def transformation_create(request: Request) -> Response:
@@ -175,6 +177,7 @@ class GalleryPagination(PageNumberPagination):
     max_page_size = 48
 
 
+@ensure_csrf_cookie
 @api_view(["GET"])
 def transformation_list(request: Request) -> Response:
     ids_param = request.query_params.get("ids", "")
