@@ -24,9 +24,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
     gap: 6px;
-    background: color-mix(in srgb, var(--mat-sys-primary) 70%, black);
+    padding-bottom: 12px;
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--mat-sys-primary) 70%, black) 0%,
+      transparent 20%
+    );
     color: #fff;
     opacity: 0;
     transition: opacity 0.2s;
@@ -42,17 +47,9 @@
     opacity: 1;
   }
 
-  @media (hover: none) {
+  @media (any-hover: none) {
     &__overlay {
       opacity: 1;
-      font-size: 0.8rem;
-      padding: 6px;
-      justify-content: flex-end;
-      background: linear-gradient(
-        to top,
-        color-mix(in srgb, var(--mat-sys-primary) 30%, black) 0%,
-        transparent 30%
-      );
     }
   }
 }
