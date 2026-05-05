@@ -108,7 +108,7 @@ def transformation_create(request: Request) -> Response:
     return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
-@api_view(["GET", "DELETE"])
+@api_view(["GET", "DELETE", "PATCH"])
 def transformation_detail(request: Request, pk: str) -> Response:
     try:
         transformation = Transformation.objects.get(pk=pk)
@@ -117,6 +117,30 @@ def transformation_detail(request: Request, pk: str) -> Response:
 
     if request.method == "DELETE":
         return _handle_delete(request, transformation)
+
+    if request.method == "PATCH":
+        return _handle_patch(request, transformation)
+
+    serializer = TransformationSerializer(transformation, context={"request": request})
+    return Response(serializer.data)
+
+
+def _handle_patch(request: Request, transformation: Transformation) -> Response:
+    token = request.headers.get("X-Delete-Token", "")
+    if not token:
+        return Response(
+            {"detail": "Delete token required."}, status=status.HTTP_401_UNAUTHORIZED
+        )
+    if not secrets.compare_digest(token, transformation.delete_token):
+        return Response(
+            {"detail": "Invalid delete token."}, status=status.HTTP_403_FORBIDDEN
+        )
+
+    if "is_featured" in request.data:
+        transformation.is_featured = _parse_bool(
+            request.data.get("is_featured"), default=False
+        )
+        transformation.save(update_fields=["is_featured"])
 
     serializer = TransformationSerializer(transformation, context={"request": request})
     return Response(serializer.data)

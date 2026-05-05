@@ -75,4 +75,13 @@ export class TransformationService {
     const headers = new HttpHeaders({ 'X-Delete-Token': token });
     return this.http.delete<void>(`/api/transformations/${id}/`, { headers });
   }
+
+  promote(id: string, token: string, featured: boolean): Observable<Transformation> {
+    const headers = new HttpHeaders({ 'X-Delete-Token': token });
+    return this.http.patch<Transformation>(
+      `/api/transformations/${id}/`,
+      { is_featured: featured },
+      { headers },
+    );
+  }
 }

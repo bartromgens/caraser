@@ -79,6 +79,27 @@ export class TransformationViewComponent implements OnInit {
     });
   }
 
+  promoteFeatured(): void {
+    const t = this.transformation();
+    if (!t) return;
+    const token = this.tokenService.get(t.id);
+    if (!token) return;
+    const promote = !t.is_featured;
+
+    this.service.promote(t.id, token, promote).subscribe({
+      next: (updated) => {
+        this.transformation.set(updated);
+        this.snackBar.open(promote ? 'Promoted to featured' : 'Removed from featured', undefined, {
+          duration: 3000,
+        });
+        this.tracking.trackEvent('Transformation', promote ? 'promote' : 'unpromote', t.id);
+      },
+      error: () => {
+        this.snackBar.open('Failed to update featured status', undefined, { duration: 3000 });
+      },
+    });
+  }
+
   download(): void {
     const t = this.transformation();
     if (!t?.result_image) return;
