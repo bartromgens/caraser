@@ -72,17 +72,14 @@ export class TransformationService {
     );
   }
 
-  delete(id: string, token: string): Observable<void> {
-    const headers = new HttpHeaders({ 'X-Delete-Token': token });
+  delete(id: string, token?: string): Observable<void> {
+    const headers = token ? new HttpHeaders({ 'X-Delete-Token': token }) : new HttpHeaders();
     return this.http.delete<void>(`/api/transformations/${id}/`, { headers });
   }
 
-  promote(id: string, token: string, featured: boolean): Observable<Transformation> {
-    const headers = new HttpHeaders({ 'X-Delete-Token': token });
-    return this.http.patch<Transformation>(
-      `/api/transformations/${id}/`,
-      { is_featured: featured },
-      { headers },
-    );
+  promote(id: string, featured: boolean): Observable<Transformation> {
+    return this.http.patch<Transformation>(`/api/transformations/${id}/`, {
+      is_featured: featured,
+    });
   }
 }

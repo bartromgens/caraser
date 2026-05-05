@@ -28,7 +28,7 @@
         <mat-icon>add_photo_alternate</mat-icon> Try your own
       </a>
       <a mat-stroked-button routerLink="/gallery"> <mat-icon>grid_view</mat-icon> Gallery </a>
-      <button mat-stroked-button *ngIf="canDelete()" (click)="promoteFeatured()">
+      <button mat-stroked-button *ngIf="canFeature()" (click)="promoteFeatured()">
         <mat-icon>{{ transformation()?.is_featured ? 'star' : 'star_border' }}</mat-icon>
         {{ transformation()?.is_featured ? 'Unfeature' : 'Feature' }}
       </button>

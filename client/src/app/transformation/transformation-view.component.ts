@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgIf } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -10,6 +10,7 @@ import { RouterLink } from '@angular/router';
 
 import { TransformationService, Transformation } from '../core/transformation.service';
 import { DeleteTokenService } from '../core/delete-token.service';
+import { AuthService } from '../core/auth.service';
 import { SeoService } from '../core/seo.service';
 import { TrackingService } from '../core/tracking.service';
 import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before-after-slider.component';
@@ -32,6 +33,7 @@ import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before
 export class TransformationViewComponent implements OnInit {
   private readonly service = inject(TransformationService);
   private readonly tokenService = inject(DeleteTokenService);
+  private readonly authService = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
@@ -41,11 +43,16 @@ export class TransformationViewComponent implements OnInit {
   transformation = signal<Transformation | null>(null);
   loading = signal(true);
   error = signal('');
-  canDelete = signal(false);
+  private readonly _ownsTransformation = signal(false);
+
+  readonly canDelete = computed(
+    () => this.authService.isAuthenticated() || this._ownsTransformation(),
+  );
+  readonly canFeature = computed(() => this.authService.isAuthenticated());
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
-    this.canDelete.set(this.tokenService.has(id));
+    this._ownsTransformation.set(this.tokenService.has(id));
     this.service.get(id).subscribe({
       next: (t) => {
         this.transformation.set(t);
@@ -65,10 +72,9 @@ export class TransformationViewComponent implements OnInit {
   deleteTransformation(): void {
     const t = this.transformation();
     if (!t) return;
-    const token = this.tokenService.get(t.id);
-    if (!token) return;
     if (!confirm('Delete this transformation and all its images? This cannot be undone.')) return;
 
+    const token = this.tokenService.get(t.id) ?? undefined;
     this.tracking.trackEvent('Transformation', 'delete', t.id);
     this.service.delete(t.id, token).subscribe({
       next: () => {
@@ -84,11 +90,9 @@ export class TransformationViewComponent implements OnInit {
   promoteFeatured(): void {
     const t = this.transformation();
     if (!t) return;
-    const token = this.tokenService.get(t.id);
-    if (!token) return;
     const promote = !t.is_featured;
 
-    this.service.promote(t.id, token, promote).subscribe({
+    this.service.promote(t.id, promote).subscribe({
       next: (updated) => {
         this.transformation.set(updated);
         this.snackBar.open(promote ? 'Promoted to featured' : 'Removed from featured', undefined, {

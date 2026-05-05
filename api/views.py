@@ -127,15 +127,19 @@ def transformation_detail(request: Request, pk: str) -> Response:
     return Response(serializer.data)
 
 
-def _handle_patch(request: Request, transformation: Transformation) -> Response:
+def _is_authenticated(request: Request) -> bool:
+    return bool(request.user and request.user.is_authenticated)
+
+
+def _has_valid_delete_token(request: Request, transformation: Transformation) -> bool:
     token = request.headers.get("X-Delete-Token", "")
-    if not token:
+    return bool(token) and secrets.compare_digest(token, transformation.delete_token)
+
+
+def _handle_patch(request: Request, transformation: Transformation) -> Response:
+    if not _is_authenticated(request):
         return Response(
-            {"detail": "Delete token required."}, status=status.HTTP_401_UNAUTHORIZED
-        )
-    if not secrets.compare_digest(token, transformation.delete_token):
-        return Response(
-            {"detail": "Invalid delete token."}, status=status.HTTP_403_FORBIDDEN
+            {"detail": "Authentication required."}, status=status.HTTP_401_UNAUTHORIZED
         )
 
     if "is_featured" in request.data:
@@ -149,15 +153,10 @@ def _handle_patch(request: Request, transformation: Transformation) -> Response:
 
 
 def _handle_delete(request: Request, transformation: Transformation) -> Response:
-    token = request.headers.get("X-Delete-Token", "")
-    if not token:
-        return Response(
-            {"detail": "Delete token required."}, status=status.HTTP_401_UNAUTHORIZED
-        )
-    if not secrets.compare_digest(token, transformation.delete_token):
-        return Response(
-            {"detail": "Invalid delete token."}, status=status.HTTP_403_FORBIDDEN
-        )
+    if not (
+        _is_authenticated(request) or _has_valid_delete_token(request, transformation)
+    ):
+        return Response({"detail": "Not allowed."}, status=status.HTTP_403_FORBIDDEN)
 
     for field in (
         transformation.original_image,
@@ -175,6 +174,15 @@ class GalleryPagination(PageNumberPagination):
     page_size = 12
     page_size_query_param = "page_size"
     max_page_size = 48
+
+
+@ensure_csrf_cookie
+@api_view(["GET"])
+def auth_me(request: Request) -> Response:
+    user = request.user
+    if user.is_authenticated:
+        return Response({"is_authenticated": True, "username": user.get_username()})
+    return Response({"is_authenticated": False})
 
 
 @ensure_csrf_cookie
