@@ -64,7 +64,7 @@ _SHAPE_STYLE_LINE = {
     ),
     Transformation.ShapeStyle.STRAIGHT: (
         "- Use clean geometric straight lines and rectangular forms for paths and planted "
-        "beds; structured and orderly layout"
+        "beds; structured and orderly layout, but do follow direction of existing street."
     ),
     Transformation.ShapeStyle.WILDERNESS: (
         "- Use dense, unstructured naturalistic planting with no defined hard edges; "
@@ -104,7 +104,7 @@ def _surface_rules(fietsstraat: bool) -> str:
         return ""
     return (
         "STREET SURFACE:\n"
-        "- The main drivable surface is a deep red asphalt 'fietsstraat' "
+        "- The main drivable surface is a deep natural red asphalt 'fietsstraat' "
         "(Dutch bicycle street), clearly reading as red/terracotta asphalt\n"
         "- Bicycles are the priority users of this red surface; any cars are guests at "
         "walking pace\n"
