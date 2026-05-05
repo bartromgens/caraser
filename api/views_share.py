@@ -123,7 +123,7 @@ def _transformation_meta(
     canonical = f"https://caraser.org/t/{t.id}"
 
     image_field: Optional[object] = None
-    for field in (t.comparison_image, t.result_image):
+    for field in (t.result_image, t.comparison_image):
         if field:
             image_field = field
             break
