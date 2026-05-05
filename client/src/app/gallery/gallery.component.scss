@@ -3,6 +3,10 @@
   max-width: 1400px;
   margin: 0 auto;
 
+  @media (max-width: 599px) {
+    padding: 24px 12px;
+  }
+
   @media (min-width: 1920px) {
     max-width: 1800px;
   }

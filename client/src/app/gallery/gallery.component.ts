@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -34,6 +34,13 @@ export class GalleryComponent implements OnInit {
   featuredItems = signal<Transformation[]>([]);
   items = signal<Transformation[]>([]);
   loading = signal(true);
+  loadingUser = signal(false);
+  loadingFeatured = signal(false);
+  loadingMore = signal(false);
+  initialLoading = computed(
+    () =>
+      (this.loading() && this.items().length === 0) || this.loadingUser() || this.loadingFeatured(),
+  );
   error = signal('');
   page = signal(1);
   hasNext = signal(false);
@@ -47,15 +54,23 @@ export class GalleryComponent implements OnInit {
 
     const userIds = this.tokenService.ids();
     if (userIds.length > 0) {
+      this.loadingUser.set(true);
       this.service.list(1, { ids: userIds }).subscribe({
-        next: (res) => this.userItems.set(res.results),
-        error: () => {},
+        next: (res) => {
+          this.userItems.set(res.results);
+          this.loadingUser.set(false);
+        },
+        error: () => this.loadingUser.set(false),
       });
     }
 
+    this.loadingFeatured.set(true);
     this.service.list(1, { featured: true, pageSize: 12 }).subscribe({
-      next: (res) => this.featuredItems.set(res.results),
-      error: () => {},
+      next: (res) => {
+        this.featuredItems.set(res.results);
+        this.loadingFeatured.set(false);
+      },
+      error: () => this.loadingFeatured.set(false),
     });
 
     this.load();
@@ -69,15 +84,18 @@ export class GalleryComponent implements OnInit {
 
   private load(append = false): void {
     this.loading.set(true);
+    if (append) this.loadingMore.set(true);
     this.service.list(this.page(), { featured: 'exclude' }).subscribe({
       next: (res) => {
         this.items.update((prev) => (append ? [...prev, ...res.results] : res.results));
         this.hasNext.set(!!res.next);
         this.loading.set(false);
+        this.loadingMore.set(false);
       },
       error: () => {
         this.error.set('Failed to load gallery.');
         this.loading.set(false);
+        this.loadingMore.set(false);
       },
     });
   }

@@ -6,6 +6,10 @@
   flex-direction: column;
   gap: 24px;
   min-height: 100%;
+
+  @media (max-width: 599px) {
+    padding: 24px 12px;
+  }
 }
 
 /* Options card */
@@ -60,7 +64,6 @@
   grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
   gap: 20px 24px;
 }
-
 
 .option-row {
   display: flex;

@@ -5,6 +5,10 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+
+  @media (max-width: 599px) {
+    padding: 24px 12px;
+  }
 }
 
 .spinner-wrap,

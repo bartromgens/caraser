@@ -2,6 +2,15 @@
   <h1 class="gallery-title">Community Gallery</h1>
   <p class="gallery-sub">Streets reclaimed — before &amp; after</p>
 
+  <div
+    *ngIf="initialLoading()"
+    class="spinner-wrap"
+    aria-live="polite"
+    aria-label="Loading gallery"
+  >
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
   <p *ngIf="error()" class="error-msg">{{ error() }}</p>
 
   <section *ngIf="userItems().length > 0" class="gallery-section">
@@ -33,10 +42,6 @@
   <section class="gallery-section">
     <h2 class="gallery-section__title">Community</h2>
 
-    <div *ngIf="loading() && items().length === 0" class="spinner-wrap">
-      <mat-spinner diameter="48"></mat-spinner>
-    </div>
-
     <p *ngIf="!loading() && items().length === 0 && !error()" class="empty-msg">
       No transformations yet. <a routerLink="/">Be the first to upload!</a>
     </p>
@@ -54,8 +59,11 @@
     </div>
 
     <div *ngIf="hasNext()" class="load-more">
-      <button mat-stroked-button (click)="loadMore()" [disabled]="loading()">
-        <mat-icon>expand_more</mat-icon> Load more
+      <button mat-stroked-button (click)="loadMore()" [disabled]="loadingMore()">
+        <mat-spinner *ngIf="loadingMore()" diameter="18"></mat-spinner>
+        <ng-container *ngIf="!loadingMore()">
+          <mat-icon>expand_more</mat-icon> Load more
+        </ng-container>
       </button>
     </div>
   </section>
