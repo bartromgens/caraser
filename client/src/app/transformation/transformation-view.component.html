@@ -42,6 +42,38 @@
       </button>
     </div>
 
+    <mat-expansion-panel *ngIf="t.prompt" class="prompt-panel">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Prompt</mat-panel-title>
+        <mat-panel-description>Options and prompt sent to the model</mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <dl class="prompt-options">
+        <div>
+          <dt>Cars</dt>
+          <dd>{{ t.allow_cars ? 'Allowed as guests' : 'Removed' }}</dd>
+        </div>
+        <div>
+          <dt>Fietsstraat</dt>
+          <dd>{{ t.fietsstraat ? 'Yes' : 'No' }}</dd>
+        </div>
+        <div>
+          <dt>Ground cover</dt>
+          <dd>{{ t.ground_cover }}</dd>
+        </div>
+        <div>
+          <dt>Shape style</dt>
+          <dd>{{ t.shape_style }}</dd>
+        </div>
+      </dl>
+
+      <pre class="prompt-text">{{ t.prompt }}</pre>
+
+      <button mat-stroked-button (click)="copyPrompt()">
+        <mat-icon>content_copy</mat-icon> Copy prompt
+      </button>
+    </mat-expansion-panel>
+
     <img
       *ngIf="t.comparison_image"
       class="comparison-img"

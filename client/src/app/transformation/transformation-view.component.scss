@@ -36,3 +36,45 @@
   border-color: var(--mat-sys-error);
   margin-left: auto;
 }
+
+.prompt-panel {
+  .prompt-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 24px;
+    margin: 0 0 16px;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    dt {
+      font-size: 0.75rem;
+      color: var(--mat-sys-on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    dd {
+      margin: 0;
+      font-size: 0.9rem;
+      text-transform: capitalize;
+    }
+  }
+
+  .prompt-text {
+    font-family: monospace;
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: var(--mat-sys-surface-variant);
+    color: var(--mat-sys-on-surface-variant);
+    padding: 12px 16px;
+    border-radius: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 0 0 16px;
+  }
+}

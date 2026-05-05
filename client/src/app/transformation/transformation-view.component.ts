@@ -4,6 +4,7 @@ import { NgIf } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 
@@ -22,6 +23,7 @@ import { BeforeAfterSliderComponent } from '../shared/before-after-slider/before
     MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
+    MatExpansionModule,
     BeforeAfterSliderComponent,
   ],
   templateUrl: './transformation-view.component.html',
@@ -142,6 +144,18 @@ export class TransformationViewComponent implements OnInit {
       this.tracking.trackEvent('Transformation', 'copy_link', this.transformation()?.id);
     } catch {
       this.snackBar.open('Could not copy link', undefined, { duration: 3000 });
+    }
+  }
+
+  async copyPrompt(): Promise<void> {
+    const prompt = this.transformation()?.prompt;
+    if (!prompt) return;
+    try {
+      await navigator.clipboard.writeText(prompt);
+      this.snackBar.open('Prompt copied to clipboard', undefined, { duration: 3000 });
+      this.tracking.trackEvent('Transformation', 'copy_prompt', this.transformation()?.id);
+    } catch {
+      this.snackBar.open('Could not copy prompt', undefined, { duration: 3000 });
     }
   }
 }

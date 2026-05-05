@@ -22,6 +22,7 @@ export interface Transformation extends TransformationOptions {
   error: string;
   is_public: boolean;
   is_featured: boolean;
+  prompt?: string | null;
   created_at: string;
   delete_token?: string;
 }
