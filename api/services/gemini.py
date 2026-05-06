@@ -153,6 +153,18 @@ STYLE: Photorealistic, natural daylight, high detail, no HDR over-processing.
 """
 
 
+_HTTP_OPTIONS = types.HttpOptions(
+    retry_options=types.HttpRetryOptions(
+        attempts=5,
+        initial_delay=1.0,
+        max_delay=60.0,
+        exp_base=2,
+        jitter=1,
+        http_status_codes=(408, 429, 500, 502, 503, 504),
+    ),
+)
+
+
 def remove_cars(
     image_bytes: bytes,
     mime_type: str = "image/jpeg",
@@ -161,7 +173,10 @@ def remove_cars(
 ) -> bytes:
     if prompt is None:
         prompt = build_prompt(options or PromptOptions())
-    client = genai.Client(api_key=settings.GEMINI_API_KEY)
+    client = genai.Client(
+        api_key=settings.GEMINI_API_KEY,
+        http_options=_HTTP_OPTIONS,
+    )
     response = client.models.generate_content(
         model=settings.GEMINI_MODEL,
         contents=[
