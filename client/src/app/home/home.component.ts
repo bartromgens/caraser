@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { NgIf, NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +21,8 @@ import { TrackingService } from '../core/tracking.service';
 import { FeaturedStripComponent } from './featured-strip/featured-strip.component';
 
 type AppState = 'upload' | 'options' | 'uploading' | 'processing' | 'error';
+
+const SLOW_PROCESSING_THRESHOLD_MS = 20_000;
 
 const DEFAULT_OPTIONS: TransformationOptions = {
   allow_cars: false,
@@ -47,7 +49,7 @@ const DEFAULT_OPTIONS: TransformationOptions = {
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   private readonly service = inject(TransformationService);
   private readonly tokenService = inject(DeleteTokenService);
   private readonly router = inject(Router);
@@ -58,10 +60,15 @@ export class HomeComponent implements OnInit {
     this.seo.reset();
   }
 
+  ngOnDestroy(): void {
+    this.clearSlowTimer();
+  }
+
   state = signal<AppState>('upload');
   errorMessage = signal('');
   previewUrl = signal<string | null>(null);
   selectedFile = signal<File | null>(null);
+  processingSlow = signal(false);
 
   isDragOver = signal(false);
 
@@ -69,6 +76,8 @@ export class HomeComponent implements OnInit {
   fietsstraat = signal<boolean>(DEFAULT_OPTIONS.fietsstraat);
   groundCover = signal<GroundCover>(DEFAULT_OPTIONS.ground_cover);
   shapeStyle = signal<ShapeStyle>(DEFAULT_OPTIONS.shape_style);
+
+  private slowTimer: ReturnType<typeof setTimeout> | null = null;
 
   get isWorking(): boolean {
     return this.state() === 'uploading' || this.state() === 'processing';
@@ -88,7 +97,11 @@ export class HomeComponent implements OnInit {
 
   get statusLabel(): string {
     if (this.state() === 'uploading') return 'Uploading image…';
-    if (this.state() === 'processing') return 'Caraser is erasing cars (this takes ~15 s)…';
+    if (this.state() === 'processing') {
+      return this.processingSlow()
+        ? 'Still working — the AI is busy right now, hang on…'
+        : 'Caraser is erasing cars (this takes ~15 s)…';
+    }
     return '';
   }
 
@@ -137,6 +150,7 @@ export class HomeComponent implements OnInit {
     this.state.set('upload');
     this.errorMessage.set('');
     this.selectedFile.set(null);
+    this.clearSlowTimer();
     if (this.previewUrl()) {
       URL.revokeObjectURL(this.previewUrl()!);
       this.previewUrl.set(null);
@@ -155,6 +169,7 @@ export class HomeComponent implements OnInit {
           this.tokenService.save(t.id, t.delete_token);
         }
         this.state.set('processing');
+        this.startSlowTimer();
         this.startPolling(t.id);
       },
       error: (err) => {
@@ -185,20 +200,39 @@ export class HomeComponent implements OnInit {
     this.service.poll(id).subscribe({
       next: (t) => {
         if (t.status === 'done') {
+          this.clearSlowTimer();
           this.tracking.trackEvent('Upload', 'generate_success');
           this.router.navigate(['/t', id]);
         }
         if (t.status === 'failed') {
+          this.clearSlowTimer();
           this.state.set('error');
           this.errorMessage.set(t.error || 'Processing failed.');
           this.tracking.trackEvent('Upload', 'generate_error');
         }
       },
       error: () => {
+        this.clearSlowTimer();
         this.state.set('error');
         this.errorMessage.set('Lost connection while waiting for result.');
         this.tracking.trackEvent('Upload', 'polling_error');
       },
     });
+  }
+
+  private startSlowTimer(): void {
+    this.clearSlowTimer();
+    this.processingSlow.set(false);
+    this.slowTimer = setTimeout(() => {
+      this.processingSlow.set(true);
+    }, SLOW_PROCESSING_THRESHOLD_MS);
+  }
+
+  private clearSlowTimer(): void {
+    if (this.slowTimer !== null) {
+      clearTimeout(this.slowTimer);
+      this.slowTimer = null;
+    }
+    this.processingSlow.set(false);
   }
 }
