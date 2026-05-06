@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 from google import genai
@@ -6,6 +7,12 @@ from google.genai import types
 from django.conf import settings
 
 from ..models import Transformation
+
+logger = logging.getLogger(__name__)
+
+
+class GeminiNoImageError(RuntimeError):
+    pass
 
 
 @dataclass(frozen=True)
@@ -164,6 +171,39 @@ _HTTP_OPTIONS = types.HttpOptions(
     ),
 )
 
+_NO_IMAGE_MAX_ATTEMPTS = 3
+
+
+def _diagnose_no_image(response) -> str:
+    candidate = response.candidates[0] if response.candidates else None
+    finish_reason = getattr(candidate, "finish_reason", None)
+
+    blocked_ratings = []
+    for r in getattr(candidate, "safety_ratings", None) or []:
+        if getattr(r, "blocked", False):
+            blocked_ratings.append(str(getattr(r, "category", r)))
+
+    pf = getattr(response, "prompt_feedback", None)
+    block_reason = getattr(pf, "block_reason", None)
+    block_reason_message = getattr(pf, "block_reason_message", None)
+
+    text_parts = [
+        p.text
+        for p in (getattr(candidate, "content", None) and candidate.content.parts or [])
+        if getattr(p, "text", None)
+    ]
+    text_snippet = " ".join(text_parts)[:500] if text_parts else None
+
+    parts = [f"finish_reason={finish_reason}"]
+    if blocked_ratings:
+        parts.append(f"blocked_categories={blocked_ratings}")
+    parts.append(f"block_reason={block_reason}")
+    if block_reason_message:
+        parts.append(f"block_reason_message={block_reason_message!r}")
+    if text_snippet:
+        parts.append(f"text={text_snippet!r}")
+    return ", ".join(parts)
+
 
 def remove_cars(
     image_bytes: bytes,
@@ -177,18 +217,29 @@ def remove_cars(
         api_key=settings.GEMINI_API_KEY,
         http_options=_HTTP_OPTIONS,
     )
-    response = client.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=[
-            types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
-            prompt,
-        ],
-        config=types.GenerateContentConfig(
-            response_modalities=["IMAGE", "TEXT"],
-            image_config=types.ImageConfig(image_size=settings.GEMINI_IMAGE_SIZE),
-        ),
+    diagnostic = ""
+    for attempt in range(1, _NO_IMAGE_MAX_ATTEMPTS + 1):
+        response = client.models.generate_content(
+            model=settings.GEMINI_MODEL,
+            contents=[
+                types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
+                prompt,
+            ],
+            config=types.GenerateContentConfig(
+                response_modalities=["IMAGE", "TEXT"],
+                image_config=types.ImageConfig(image_size=settings.GEMINI_IMAGE_SIZE),
+            ),
+        )
+        for part in response.candidates[0].content.parts:
+            if part.inline_data is not None:
+                return part.inline_data.data
+        diagnostic = _diagnose_no_image(response)
+        logger.warning(
+            "Gemini returned no image (attempt %d/%d): %s",
+            attempt,
+            _NO_IMAGE_MAX_ATTEMPTS,
+            diagnostic,
+        )
+    raise GeminiNoImageError(
+        f"Gemini returned no image after {_NO_IMAGE_MAX_ATTEMPTS} attempts ({diagnostic})"
     )
-    for part in response.candidates[0].content.parts:
-        if part.inline_data is not None:
-            return part.inline_data.data
-    raise ValueError("Gemini did not return an image in its response")
