@@ -33,6 +33,11 @@
   display: flex;
   justify-content: center;
   padding: 32px 0;
+
+  button mat-icon {
+    vertical-align: middle;
+    line-height: 1;
+  }
 }
 
 .error-msg,
