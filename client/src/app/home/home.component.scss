@@ -12,6 +12,32 @@
   }
 }
 
+/* Intro */
+.intro {
+  text-align: center;
+  margin: 8px auto 0;
+  max-width: 640px;
+
+  &__title {
+    margin: 0 0 12px;
+    font-size: 1.75rem;
+    font-weight: 600;
+    font-family: Quicksand, sans-serif;
+    line-height: 1.2;
+
+    @media (max-width: 599px) {
+      font-size: 1.4rem;
+    }
+  }
+
+  &__body {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
 /* Options card */
 .options-card {
   border-radius: 20px;

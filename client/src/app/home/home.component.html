@@ -1,6 +1,14 @@
 <div class="home-container">
   <!-- STEP 1: Upload dropzone -->
   <ng-container *ngIf="isUploadStep">
+    <header class="intro">
+      <h1 class="intro__title">You stopped seeing the cars, didn't you?</h1>
+      <p class="intro__body">
+        Upload a street photo and find out. We've grown so used to cars that we barely see them
+        anymore, until they're gone.
+      </p>
+    </header>
+
     <div
       class="dropzone"
       [ngClass]="{ 'dropzone--active': isDragOver() }"
