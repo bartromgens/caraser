@@ -20,13 +20,16 @@ def _load_font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
         return ImageFont.load_default(size=size)
 
 
-def _draw_label(draw: ImageDraw.ImageDraw, text: str, x: int, y: int, font) -> None:
+def _draw_label(
+    draw: ImageDraw.ImageDraw, text: str, y: int, font, panel_w: int
+) -> None:
     bbox = draw.textbbox((0, 0), text, font=font)
     tw = bbox[2] - bbox[0]
     th = bbox[3] - bbox[1]
-    rx0 = x
+    label_w = tw + _LABEL_PADDING_X * 2
+    rx0 = (panel_w - label_w) // 2
     ry0 = y
-    rx1 = x + tw + _LABEL_PADDING_X * 2
+    rx1 = rx0 + label_w
     ry1 = y + th + _LABEL_PADDING_Y * 2
     draw.rounded_rectangle([rx0, ry0, rx1, ry1], radius=_LABEL_RADIUS, fill=_LABEL_BG)
     draw.text(
@@ -72,10 +75,8 @@ def build_comparison_image(before_bytes: bytes, after_bytes: bytes) -> bytes:
     draw = ImageDraw.Draw(overlay)
     font = _load_font(_LABEL_FONT_SIZE)
 
-    _draw_label(draw, "BEFORE", _LABEL_MARGIN, _LABEL_MARGIN, font)
-    _draw_label(
-        draw, "AFTER", _LABEL_MARGIN, before.height + _GAP + _LABEL_MARGIN, font
-    )
+    _draw_label(draw, "BEFORE", _LABEL_MARGIN, font, canvas_w)
+    _draw_label(draw, "AFTER", before.height + _GAP + _LABEL_MARGIN, font, canvas_w)
 
     canvas = canvas.convert("RGBA")
     canvas = Image.alpha_composite(canvas, overlay)
