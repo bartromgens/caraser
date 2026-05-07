@@ -126,7 +126,9 @@ def build_prompt(options: PromptOptions) -> str:
         else "car-free public space"
     )
 
-    return f"""Edit this street photo into a {headline}. Keep the same camera angle.
+    return f"""Edit this street photo into a {headline}. Keep the same camera angle. \
+Every existing building, facade, roofline, window, door, and shop sign must remain \
+identical to the source — do not add, remove, or alter any architecture.
 
 {_vehicle_rules(options.allow_cars)}
 
