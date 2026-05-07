@@ -59,9 +59,13 @@ def build_comparison_image(before_bytes: bytes, after_bytes: bytes) -> bytes:
 
     # Choose canvas width = narrowest image width (no upscaling).
     canvas_w = min(before.width, after.width)
-    # Each panel fills exactly half the 4:5 canvas height (minus the gap).
     panel_w = canvas_w
-    panel_h = (canvas_w * 5 // 4 - _GAP) // 2
+    # Natural panel height for each image at canvas_w width (no upscaling).
+    before_natural_h = round(before.height / before.width * panel_w)
+    after_natural_h = round(after.height / after.width * panel_w)
+    # Cap at 4:5 max; use the smaller of the two naturals to avoid black bars.
+    max_panel_h = canvas_w * 5 // 8  # half of 4:5 canvas height
+    panel_h = min(before_natural_h, after_natural_h, max_panel_h)
 
     before = _crop_to_panel(before, panel_w, panel_h)
     after = _crop_to_panel(after, panel_w, panel_h)
