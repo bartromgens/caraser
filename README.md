@@ -40,6 +40,15 @@ The Angular dev server runs on [http://localhost:4200](http://localhost:4200) an
 
 The `media/` folder (uploaded and generated images) is git-ignored and created automatically when the first image is processed.
 
+## Related organizations
+
+- [Carfree Cities Alliance](https://www.carfreealliance.org/) — global network advocating for carfree urban living
+- [The Lab of Thought](https://thelabofthought.co/) — platform rethinking mobility and public space through research and experimentation
+- [Gehl](https://gehl.com/) — urban design consultancy focused on human-scale, people-first cities
+- [Strong Towns](https://www.strongtowns.org/) — advocates for financially resilient, walkable communities over car-dependent development
+- [ITDP](https://www.itdp.org/) — Institute for Transportation and Development Policy; research and advocacy for sustainable transport globally
+- [Streetsblog](https://streetsblog.org/) — media network covering sustainable urban transport and street design
+
 ## Production management commands
 
 ```bash
