@@ -2,6 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, interval, switchMap, takeWhile, distinctUntilChanged } from 'rxjs';
 
+export interface PaintColor {
+  hex: string;
+  color_name: string;
+  label: string;
+  short: string;
+}
+
 export type GroundCover = 'mixed' | 'stones' | 'grass' | 'flowers';
 export type ShapeStyle = 'mixed' | 'organic' | 'straight' | 'wilderness';
 
@@ -14,7 +21,9 @@ export interface TransformationOptions {
 
 export interface Transformation extends TransformationOptions {
   id: string;
+  mode: 'classic' | 'designer';
   original_image: string;
+  overlay_image: string | null;
   result_image: string | null;
   thumbnail_image: string | null;
   comparison_image: string | null;
@@ -23,6 +32,7 @@ export interface Transformation extends TransformationOptions {
   is_public: boolean;
   is_featured: boolean;
   prompt?: string | null;
+  annotated_image?: string | null;
   created_at: string;
   delete_token?: string;
 }
@@ -45,6 +55,14 @@ export class TransformationService {
     form.append('fietsstraat', String(options.fietsstraat));
     form.append('ground_cover', options.ground_cover);
     form.append('shape_style', options.shape_style);
+    return this.http.post<Transformation>('/api/transformations/upload/', form);
+  }
+
+  uploadDesigner(file: File, overlayPng: Blob): Observable<Transformation> {
+    const form = new FormData();
+    form.append('image', file);
+    form.append('overlay', overlayPng, 'overlay.png');
+    form.append('mode', 'designer');
     return this.http.post<Transformation>('/api/transformations/upload/', form);
   }
 
@@ -81,5 +99,9 @@ export class TransformationService {
     return this.http.patch<Transformation>(`/api/transformations/${id}/`, {
       is_featured: featured,
     });
+  }
+
+  getLegend(): Observable<PaintColor[]> {
+    return this.http.get<PaintColor[]>('/api/designer/legend/');
   }
 }

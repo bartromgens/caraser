@@ -8,6 +8,10 @@ export const routes: Routes = [
     loadComponent: () => import('./gallery/gallery.component').then((m) => m.GalleryComponent),
   },
   {
+    path: 'designer',
+    loadComponent: () => import('./designer/designer.component').then((m) => m.DesignerComponent),
+  },
+  {
     path: 't/:id',
     loadComponent: () =>
       import('./transformation/transformation-view.component').then(

@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("auth/me/", views.auth_me, name="auth-me"),
+    path("designer/legend/", views.designer_legend, name="designer-legend"),
     path("transformations/", views.transformation_list, name="transformation-list"),
     path(
         "transformations/upload/",

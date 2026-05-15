@@ -1,0 +1,98 @@
+<div class="designer-container">
+  <!-- STEP 1: Upload dropzone -->
+  <ng-container *ngIf="isUploadStep">
+    <header class="intro">
+      <h1 class="intro__title">Design your street</h1>
+      <p class="intro__body">
+        Upload a street photo, then paint your design using colors — each color tells the AI exactly
+        what to place in that area.
+      </p>
+    </header>
+
+    <app-paint-canvas *ngIf="paintColors().length" [colors]="paintColors()"></app-paint-canvas>
+
+    <div
+      class="dropzone"
+      [ngClass]="{ 'dropzone--active': isDragOver() }"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)"
+    >
+      <mat-icon class="dropzone__icon">add_photo_alternate</mat-icon>
+      <p class="dropzone__heading">Upload a street photo</p>
+      <p class="dropzone__sub">Drag &amp; drop or click to browse</p>
+      <button mat-flat-button (click)="fileInput.click()">
+        <mat-icon>upload</mat-icon> Choose file
+      </button>
+      <input
+        #fileInput
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        style="display: none"
+        (change)="onFileSelected($event)"
+      />
+      <p class="dropzone__hint">JPEG · PNG · WebP · max 20 MB</p>
+    </div>
+  </ng-container>
+
+  <!-- STEP 2: Paint -->
+  <ng-container *ngIf="isPaintStep">
+    <div class="paint-header">
+      <div>
+        <p class="paint-title">Paint your design</p>
+        <p class="paint-sub">
+          Select a color and paint on the photo. Each color represents a different element. Leave
+          areas unpainted to let the AI decide.
+        </p>
+      </div>
+      <div class="paint-actions-top">
+        <button mat-stroked-button type="button" (click)="changeImage()">
+          <mat-icon>arrow_back</mat-icon> Change image
+        </button>
+        <button mat-flat-button type="button" [disabled]="!canGenerate()" (click)="generate()">
+          <mat-icon>auto_fix_high</mat-icon> Generate image
+        </button>
+      </div>
+    </div>
+
+    <!-- Hidden img to capture naturalWidth/Height -->
+    <img
+      *ngIf="previewUrl()"
+      [src]="previewUrl()!"
+      style="display: none"
+      (load)="onImageLoad($event)"
+      alt=""
+    />
+
+    <app-paint-canvas
+      *ngIf="naturalWidth() > 0 && paintColors().length"
+      [colors]="paintColors()"
+      [imageUrl]="previewUrl()!"
+      [naturalWidth]="naturalWidth()"
+      [naturalHeight]="naturalHeight()"
+      (hasStrokes)="onHasStrokes($event)"
+    ></app-paint-canvas>
+  </ng-container>
+
+  <!-- WORKING: progress -->
+  <div *ngIf="isWorking" class="progress-card">
+    <img *ngIf="previewUrl()" [src]="previewUrl()!" class="preview-img" alt="Street photo" />
+    <div class="progress-info">
+      <p class="progress-label">{{ statusLabel }}</p>
+      <mat-progress-bar [mode]="progressMode"></mat-progress-bar>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <mat-card *ngIf="state() === 'error'" class="error-card">
+    <mat-card-content>
+      <div class="error-body">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <p>{{ errorMessage() }}</p>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-flat-button (click)="reset()"><mat-icon>refresh</mat-icon> Try again</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

@@ -1,94 +1,86 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { NgIf, NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
-import {
-  GroundCover,
-  ShapeStyle,
-  TransformationOptions,
-  TransformationService,
-} from '../core/transformation.service';
+import { PaintColor, TransformationService } from '../core/transformation.service';
 import { DeleteTokenService } from '../core/delete-token.service';
 import { SeoService } from '../core/seo.service';
 import { TrackingService } from '../core/tracking.service';
-import { FeaturedStripComponent } from './featured-strip/featured-strip.component';
+import { PaintCanvasComponent } from './paint-canvas/paint-canvas.component';
 
-type AppState = 'upload' | 'options' | 'uploading' | 'processing' | 'error';
+type AppState = 'upload' | 'paint' | 'uploading' | 'processing' | 'error';
 
 const SLOW_PROCESSING_THRESHOLD_MS = 20_000;
 
-const DEFAULT_OPTIONS: TransformationOptions = {
-  allow_cars: false,
-  fietsstraat: false,
-  ground_cover: 'mixed',
-  shape_style: 'mixed',
-};
-
 @Component({
-  selector: 'app-home',
+  selector: 'app-designer',
   standalone: true,
   imports: [
     NgIf,
     NgClass,
     MatButtonModule,
     MatCardModule,
-    MatFormFieldModule,
     MatIconModule,
     MatProgressBarModule,
-    MatSelectModule,
-    MatSlideToggleModule,
-    FeaturedStripComponent,
+    PaintCanvasComponent,
   ],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.scss',
+  templateUrl: './designer.component.html',
+  styleUrl: './designer.component.scss',
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class DesignerComponent implements OnInit, OnDestroy {
   private readonly service = inject(TransformationService);
   private readonly tokenService = inject(DeleteTokenService);
   private readonly router = inject(Router);
   private readonly seo = inject(SeoService);
   private readonly tracking = inject(TrackingService);
 
-  ngOnInit(): void {
-    this.seo.reset();
-  }
-
-  ngOnDestroy(): void {
-    this.clearSlowTimer();
-  }
+  @ViewChild(PaintCanvasComponent) paintCanvas?: PaintCanvasComponent;
 
   state = signal<AppState>('upload');
   errorMessage = signal('');
   previewUrl = signal<string | null>(null);
+  paintColors = signal<PaintColor[]>([]);
   selectedFile = signal<File | null>(null);
+  naturalWidth = signal(0);
+  naturalHeight = signal(0);
+  canGenerate = signal(false);
   processingSlow = signal(false);
 
   isDragOver = signal(false);
 
-  allowCars = signal<boolean>(DEFAULT_OPTIONS.allow_cars);
-  fietsstraat = signal<boolean>(DEFAULT_OPTIONS.fietsstraat);
-  groundCover = signal<GroundCover>(DEFAULT_OPTIONS.ground_cover);
-  shapeStyle = signal<ShapeStyle>(DEFAULT_OPTIONS.shape_style);
-
   private slowTimer: ReturnType<typeof setTimeout> | null = null;
 
-  get isWorking(): boolean {
-    return this.state() === 'uploading' || this.state() === 'processing';
+  ngOnInit(): void {
+    this.seo.set({
+      title: 'Designer mode — Caraser',
+      description: 'Draw your ideal street design with colors and let AI bring it to life.',
+    });
+    this.service.getLegend().subscribe({ next: (colors) => this.paintColors.set(colors) });
+    const file = (history.state as { file?: File })?.file;
+    if (file instanceof File) {
+      this.processFile(file);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.clearSlowTimer();
+    if (this.previewUrl()) URL.revokeObjectURL(this.previewUrl()!);
   }
 
   get isUploadStep(): boolean {
     return this.state() === 'upload';
   }
 
-  get isOptionsStep(): boolean {
-    return this.state() === 'options';
+  get isPaintStep(): boolean {
+    return this.state() === 'paint';
+  }
+
+  get isWorking(): boolean {
+    return this.state() === 'uploading' || this.state() === 'processing';
   }
 
   get progressMode(): 'indeterminate' | 'buffer' {
@@ -100,7 +92,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (this.state() === 'processing') {
       return this.processingSlow()
         ? 'Still working — the AI is busy right now, hang on…'
-        : 'Caraser is erasing cars (this takes ~15 s)…';
+        : 'Caraser is applying your design (this takes ~15 s)…';
     }
     return '';
   }
@@ -128,19 +120,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     input.value = '';
   }
 
-  resetOptions(): void {
-    this.allowCars.set(DEFAULT_OPTIONS.allow_cars);
-    this.fietsstraat.set(DEFAULT_OPTIONS.fietsstraat);
-    this.groundCover.set(DEFAULT_OPTIONS.ground_cover);
-    this.shapeStyle.set(DEFAULT_OPTIONS.shape_style);
-    this.tracking.trackEvent('Upload', 'reset_options');
+  onImageLoad(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    this.naturalWidth.set(img.naturalWidth);
+    this.naturalHeight.set(img.naturalHeight);
   }
 
-  openInDesigner(): void {
-    const file = this.selectedFile();
-    if (!file) return;
-    this.router.navigate(['/designer'], { state: { file } });
-    this.tracking.trackEvent('Upload', 'open_in_designer');
+  onHasStrokes(has: boolean): void {
+    this.canGenerate.set(has);
   }
 
   changeImage(): void {
@@ -149,32 +136,27 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.previewUrl.set(null);
     }
     this.selectedFile.set(null);
+    this.canGenerate.set(false);
     this.state.set('upload');
-    this.tracking.trackEvent('Upload', 'change_image');
   }
 
-  reset(): void {
-    this.state.set('upload');
-    this.errorMessage.set('');
-    this.selectedFile.set(null);
-    this.clearSlowTimer();
-    if (this.previewUrl()) {
-      URL.revokeObjectURL(this.previewUrl()!);
-      this.previewUrl.set(null);
-    }
-  }
-
-  generate(): void {
-    const file = this.selectedFile();
-    if (!file) return;
+  async generate(): Promise<void> {
+    if (!this.paintCanvas || !this.selectedFile()) return;
     this.state.set('uploading');
-    this.tracking.trackEvent('Upload', 'generate');
+    this.tracking.trackEvent('Designer', 'generate');
 
-    this.service.upload(file, this.currentOptions()).subscribe({
+    let overlayBlob: Blob;
+    try {
+      overlayBlob = await this.paintCanvas.exportPng();
+    } catch {
+      this.state.set('error');
+      this.errorMessage.set('Could not export the painted overlay. Please try again.');
+      return;
+    }
+
+    this.service.uploadDesigner(this.selectedFile()!, overlayBlob).subscribe({
       next: (t) => {
-        if (t.delete_token) {
-          this.tokenService.save(t.id, t.delete_token);
-        }
+        if (t.delete_token) this.tokenService.save(t.id, t.delete_token);
         this.state.set('processing');
         this.startSlowTimer();
         this.startPolling(t.id);
@@ -182,25 +164,29 @@ export class HomeComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.state.set('error');
         this.errorMessage.set(err?.error?.detail ?? 'Upload failed. Please try again.');
-        this.tracking.trackEvent('Upload', 'upload_error');
+        this.tracking.trackEvent('Designer', 'upload_error');
       },
     });
   }
 
-  private currentOptions(): TransformationOptions {
-    return {
-      allow_cars: this.allowCars(),
-      fietsstraat: this.fietsstraat(),
-      ground_cover: this.groundCover(),
-      shape_style: this.shapeStyle(),
-    };
+  reset(): void {
+    this.state.set('upload');
+    this.errorMessage.set('');
+    this.selectedFile.set(null);
+    this.canGenerate.set(false);
+    this.clearSlowTimer();
+    if (this.previewUrl()) {
+      URL.revokeObjectURL(this.previewUrl()!);
+      this.previewUrl.set(null);
+    }
   }
 
   private processFile(file: File): void {
     this.selectedFile.set(file);
     this.previewUrl.set(URL.createObjectURL(file));
-    this.state.set('options');
-    this.tracking.trackEvent('Upload', 'file_selected');
+    this.canGenerate.set(false);
+    this.state.set('paint');
+    this.tracking.trackEvent('Designer', 'file_selected');
   }
 
   private startPolling(id: string): void {
@@ -208,21 +194,21 @@ export class HomeComponent implements OnInit, OnDestroy {
       next: (t) => {
         if (t.status === 'done') {
           this.clearSlowTimer();
-          this.tracking.trackEvent('Upload', 'generate_success');
+          this.tracking.trackEvent('Designer', 'generate_success');
           this.router.navigate(['/t', id]);
         }
         if (t.status === 'failed') {
           this.clearSlowTimer();
           this.state.set('error');
           this.errorMessage.set(t.error || 'Processing failed.');
-          this.tracking.trackEvent('Upload', 'generate_error');
+          this.tracking.trackEvent('Designer', 'generate_error');
         }
       },
       error: () => {
         this.clearSlowTimer();
         this.state.set('error');
         this.errorMessage.set('Lost connection while waiting for result.');
-        this.tracking.trackEvent('Upload', 'polling_error');
+        this.tracking.trackEvent('Designer', 'polling_error');
       },
     });
   }

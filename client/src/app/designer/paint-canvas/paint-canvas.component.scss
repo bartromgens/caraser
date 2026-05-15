@@ -1,0 +1,127 @@
+.paint-canvas-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.offscreen-canvas {
+  display: none;
+}
+
+// Toolbar
+.paint-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--mat-sys-surface-container);
+  border-radius: 12px;
+}
+
+.toolbar-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.palette {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 6px;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--mat-sys-on-surface-variant);
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-on-surface);
+  }
+
+  &--active {
+    border-color: var(--mat-sys-primary) !important;
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+}
+
+.swatch-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+
+.swatch-label {
+  white-space: nowrap;
+}
+
+.tool-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--mat-sys-outline-variant);
+  margin: 0 4px;
+}
+
+.tool-active {
+  color: var(--mat-sys-primary);
+}
+
+.brush-size {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  mat-slider {
+    width: 100px;
+    --mat-slider-inactive-track-color: var(--mat-sys-outline);
+  }
+}
+
+.brush-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Canvas stage
+.canvas-stage {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.canvas-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+
+.display-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.65;
+}

@@ -6,13 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0007_add_prompt'),
+        ("api", "0007_add_prompt"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='transformation',
-            name='shape_style',
-            field=models.CharField(choices=[('organic', 'Organic'), ('straight', 'Straight'), ('wilderness', 'Wilderness')], default='organic', max_length=16),
+            model_name="transformation",
+            name="shape_style",
+            field=models.CharField(
+                choices=[
+                    ("organic", "Organic"),
+                    ("straight", "Straight"),
+                    ("wilderness", "Wilderness"),
+                ],
+                default="organic",
+                max_length=16,
+            ),
         ),
     ]

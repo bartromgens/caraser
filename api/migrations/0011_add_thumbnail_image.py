@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0010_alter_transformation_shape_style'),
+        ("api", "0010_alter_transformation_shape_style"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='transformation',
-            name='thumbnail_image',
-            field=models.ImageField(blank=True, null=True, upload_to='thumbnails/%Y/%m/%d/'),
+            model_name="transformation",
+            name="thumbnail_image",
+            field=models.ImageField(
+                blank=True, null=True, upload_to="thumbnails/%Y/%m/%d/"
+            ),
         ),
     ]

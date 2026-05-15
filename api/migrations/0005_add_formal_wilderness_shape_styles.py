@@ -7,18 +7,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0004_transformation_delete_token'),
+        ("api", "0004_transformation_delete_token"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='transformation',
-            name='delete_token',
-            field=models.CharField(default=secrets.token_urlsafe, editable=False, max_length=64),
+            model_name="transformation",
+            name="delete_token",
+            field=models.CharField(
+                default=secrets.token_urlsafe, editable=False, max_length=64
+            ),
         ),
         migrations.AlterField(
-            model_name='transformation',
-            name='shape_style',
-            field=models.CharField(choices=[('organic', 'Organic'), ('straight', 'Straight'), ('formal', 'Formal'), ('wilderness', 'Wilderness')], default='organic', max_length=16),
+            model_name="transformation",
+            name="shape_style",
+            field=models.CharField(
+                choices=[
+                    ("organic", "Organic"),
+                    ("straight", "Straight"),
+                    ("formal", "Formal"),
+                    ("wilderness", "Wilderness"),
+                ],
+                default="organic",
+                max_length=16,
+            ),
         ),
     ]

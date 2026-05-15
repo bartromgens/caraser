@@ -1,0 +1,146 @@
+.designer-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// Intro
+.intro {
+  text-align: center;
+  padding: 0 8px;
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: var(--mat-sys-on-surface);
+  }
+
+  &__body {
+    font-size: 1.05rem;
+    color: var(--mat-sys-on-surface-variant);
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+}
+
+// Dropzone (mirrors home)
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+  border: 2px dashed var(--mat-sys-outline);
+  border-radius: 16px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+
+  &--active {
+    border-color: var(--mat-sys-primary);
+    background: var(--mat-sys-surface-container-high);
+  }
+
+  &__icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--mat-sys-primary);
+  }
+
+  &__heading {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  &__sub {
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+    font-size: 0.9rem;
+  }
+
+  &__hint {
+    font-size: 0.78rem;
+    color: var(--mat-sys-outline);
+    margin: 0;
+  }
+}
+
+// Paint step header
+.paint-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.paint-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.paint-sub {
+  font-size: 0.88rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+  max-width: 480px;
+  line-height: 1.4;
+}
+
+.paint-actions-top {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+// Progress card (mirrors home)
+.progress-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 24px;
+  background: var(--mat-sys-surface-container);
+  border-radius: 16px;
+}
+
+.preview-img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.progress-info {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progress-label {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+}
+
+// Error card (mirrors home)
+.error-card {
+  .error-body {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
