@@ -6,7 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
-import { TransformationService } from '../core/transformation.service';
+import { PaintColor, TransformationService } from '../core/transformation.service';
 import { DeleteTokenService } from '../core/delete-token.service';
 import { SeoService } from '../core/seo.service';
 import { TrackingService } from '../core/tracking.service';
@@ -43,6 +43,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
   state = signal<AppState>('upload');
   errorMessage = signal('');
   previewUrl = signal<string | null>(null);
+  paintColors = signal<PaintColor[]>([]);
   selectedFile = signal<File | null>(null);
   naturalWidth = signal(0);
   naturalHeight = signal(0);
@@ -58,6 +59,7 @@ export class DesignerComponent implements OnInit, OnDestroy {
       title: 'Designer mode — Caraser',
       description: 'Draw your ideal street design with colors and let AI bring it to life.',
     });
+    this.service.getLegend().subscribe({ next: (colors) => this.paintColors.set(colors) });
   }
 
   ngOnDestroy(): void {

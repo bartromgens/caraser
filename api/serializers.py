@@ -48,17 +48,26 @@ class TransformationSerializer(serializers.ModelSerializer):
         use_url=True, allow_null=True, read_only=True
     )
     prompt = serializers.SerializerMethodField()
+    annotated_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Transformation
-        fields = _COMMON_FIELDS + ["prompt"]
-        read_only_fields = _COMMON_READ_ONLY + ["prompt"]
+        fields = _COMMON_FIELDS + ["prompt", "annotated_image"]
+        read_only_fields = _COMMON_READ_ONLY + ["prompt", "annotated_image"]
 
     def get_prompt(self, obj: Transformation) -> str | None:
         request = self.context.get("request")
         if request and request.user.is_authenticated:
             return obj.prompt or ""
         return None
+
+    def get_annotated_image(self, obj: Transformation) -> str | None:
+        request = self.context.get("request")
+        if not (request and request.user.is_authenticated):
+            return None
+        if not obj.annotated_image:
+            return None
+        return request.build_absolute_uri(obj.annotated_image.url)
 
 
 class TransformationCreateSerializer(TransformationSerializer):

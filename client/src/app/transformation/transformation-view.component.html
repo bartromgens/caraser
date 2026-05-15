@@ -48,7 +48,7 @@
         <mat-panel-description>Options and prompt sent to the model</mat-panel-description>
       </mat-expansion-panel-header>
 
-      <dl class="prompt-options">
+      <dl class="prompt-options" *ngIf="t.mode === 'classic'">
         <div>
           <dt>Cars</dt>
           <dd>{{ t.allow_cars ? 'Allowed as guests' : 'Removed' }}</dd>
@@ -66,6 +66,11 @@
           <dd>{{ t.shape_style }}</dd>
         </div>
       </dl>
+
+      <div *ngIf="t.mode === 'designer' && t.annotated_image" class="annotated-wrap">
+        <p class="annotated-label">IMAGE 2 sent to Gemini (original + zone annotations):</p>
+        <img class="annotated-img" [src]="t.annotated_image" alt="Annotated image sent to Gemini" />
+      </div>
 
       <pre class="prompt-text">{{ t.prompt }}</pre>
 

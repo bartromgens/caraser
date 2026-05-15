@@ -2,6 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, interval, switchMap, takeWhile, distinctUntilChanged } from 'rxjs';
 
+export interface PaintColor {
+  hex: string;
+  color_name: string;
+  label: string;
+  short: string;
+}
+
 export type GroundCover = 'mixed' | 'stones' | 'grass' | 'flowers';
 export type ShapeStyle = 'mixed' | 'organic' | 'straight' | 'wilderness';
 
@@ -25,6 +32,7 @@ export interface Transformation extends TransformationOptions {
   is_public: boolean;
   is_featured: boolean;
   prompt?: string | null;
+  annotated_image?: string | null;
   created_at: string;
   delete_token?: string;
 }
@@ -91,5 +99,9 @@ export class TransformationService {
     return this.http.patch<Transformation>(`/api/transformations/${id}/`, {
       is_featured: featured,
     });
+  }
+
+  getLegend(): Observable<PaintColor[]> {
+    return this.http.get<PaintColor[]>('/api/designer/legend/');
   }
 }

@@ -16,24 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
-
-// Color legend — keep in sync with api/services/designer.py
-export interface PaintColor {
-  hex: string;
-  short: string;
-  label: string;
-}
-
-export const PAINT_COLORS: PaintColor[] = [
-  { hex: '#FF4FA8', short: 'flowers', label: 'Flowers' },
-  { hex: '#000000', short: 'road', label: 'Road' },
-  { hex: '#37B24D', short: 'grass', label: 'Grass' },
-  { hex: '#7B4B23', short: 'trees', label: 'Trees' },
-  { hex: '#1E88E5', short: 'water', label: 'Water' },
-  { hex: '#FFD60A', short: 'seating', label: 'Seating' },
-  { hex: '#FFFFFF', short: 'stone', label: 'Stone' },
-  { hex: '#9E9E9E', short: 'keep', label: 'Keep as-is' },
-];
+import { PaintColor } from '../../core/transformation.service';
 
 @Component({
   selector: 'app-paint-canvas',
@@ -43,6 +26,7 @@ export const PAINT_COLORS: PaintColor[] = [
   styleUrl: './paint-canvas.component.scss',
 })
 export class PaintCanvasComponent implements OnChanges, OnDestroy {
+  @Input() colors: PaintColor[] = [];
   @Input() imageUrl!: string;
   @Input() naturalWidth = 0;
   @Input() naturalHeight = 0;
@@ -53,8 +37,7 @@ export class PaintCanvasComponent implements OnChanges, OnDestroy {
   offscreenCanvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('imageEl', { static: false }) imageElRef!: ElementRef<HTMLImageElement>;
 
-  readonly colors = PAINT_COLORS;
-  activeColor = signal<PaintColor>(PAINT_COLORS[2]); // grass default
+  activeColor = signal<PaintColor | null>(null);
   brushSize = 50;
   isEraser = signal(false);
 
@@ -67,8 +50,10 @@ export class PaintCanvasComponent implements OnChanges, OnDestroy {
   private undoStack: ImageData[] = [];
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['colors'] && this.colors.length && !this.activeColor()) {
+      this.activeColor.set(this.colors[2] ?? this.colors[0]);
+    }
     if (changes['imageUrl'] && this.imageUrl) {
-      // Clear canvases when a new image is loaded
       setTimeout(() => this.clearAll(), 50);
     }
   }
@@ -80,6 +65,10 @@ export class PaintCanvasComponent implements OnChanges, OnDestroy {
   selectColor(color: PaintColor): void {
     this.activeColor.set(color);
     this.isEraser.set(false);
+  }
+
+  activeHex(): string | null {
+    return this.activeColor()?.hex ?? null;
   }
 
   toggleEraser(): void {
@@ -201,9 +190,11 @@ export class PaintCanvasComponent implements OnChanges, OnDestroy {
       ctx.fillStyle = 'rgba(0,0,0,1)';
       ctx.strokeStyle = 'rgba(0,0,0,1)';
     } else {
+      const hex = this.activeHex();
+      if (!hex) return;
       ctx.globalCompositeOperation = 'source-over';
-      ctx.fillStyle = this.activeColor().hex;
-      ctx.strokeStyle = this.activeColor().hex;
+      ctx.fillStyle = hex;
+      ctx.strokeStyle = hex;
     }
   }
 

@@ -13,6 +13,7 @@ from rest_framework.response import Response
 
 from .models import Transformation
 from .serializers import TransformationCreateSerializer, TransformationSerializer
+from .services.designer import LEGEND
 from .tasks import start_processing
 
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20 MB
@@ -113,6 +114,20 @@ def _to_png_overlay(file, target_width: int, target_height: int):
         InMemoryUploadedFile(buf, "overlay", f"{stem}.png", "image/png", size, None),
         None,
     )
+
+
+@api_view(["GET"])
+def designer_legend(request: Request) -> Response:
+    data = [
+        {
+            "hex": e["hex"],
+            "color_name": e["color_name"],
+            "label": e["label"],
+            "short": e["short"],
+        }
+        for e in LEGEND
+    ]
+    return Response(data)
 
 
 @csrf_protect

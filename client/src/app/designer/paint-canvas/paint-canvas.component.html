@@ -13,7 +13,7 @@
       <button
         *ngFor="let color of colors"
         class="swatch"
-        [class.swatch--active]="!isEraser() && activeColor().hex === color.hex"
+        [class.swatch--active]="!isEraser() && activeColor()?.hex === color.hex"
         [style.background]="color.hex"
         [style.border-color]="color.hex === '#FFFFFF' ? '#ccc' : color.hex"
         [matTooltip]="color.label"

@@ -63,7 +63,8 @@
     />
 
     <app-paint-canvas
-      *ngIf="naturalWidth() > 0"
+      *ngIf="naturalWidth() > 0 && paintColors().length"
+      [colors]="paintColors()"
       [imageUrl]="previewUrl()!"
       [naturalWidth]="naturalWidth()"
       [naturalHeight]="naturalHeight()"

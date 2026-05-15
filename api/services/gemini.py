@@ -210,19 +210,30 @@ def _diagnose_no_image(response) -> str:
 def generate_image(
     image_parts: list[tuple[bytes, str]],
     prompt: str,
+    model: str | None = None,
+    image_labels: list[str] | None = None,
 ) -> bytes:
-    """Call Gemini with one or more image parts plus a text prompt, return image bytes."""
+    """Call Gemini with one or more image parts plus a text prompt, return image bytes.
+
+    image_labels, when provided, are interleaved before each image so the model
+    can unambiguously map label → image bytes (e.g. "IMAGE 1:" before the first
+    image, "IMAGE 2:" before the second).
+    """
     client = genai.Client(
         api_key=settings.GEMINI_API_KEY,
         http_options=_HTTP_OPTIONS,
     )
-    contents = [
-        types.Part.from_bytes(data=data, mime_type=mime) for data, mime in image_parts
-    ] + [prompt]
+    contents: list = []
+    for i, (data, mime) in enumerate(image_parts):
+        if image_labels and i < len(image_labels):
+            contents.append(image_labels[i])
+        contents.append(types.Part.from_bytes(data=data, mime_type=mime))
+    contents.append(prompt)
+    resolved_model = model or settings.GEMINI_MODEL
     diagnostic = ""
     for attempt in range(1, _NO_IMAGE_MAX_ATTEMPTS + 1):
         response = client.models.generate_content(
-            model=settings.GEMINI_MODEL,
+            model=resolved_model,
             contents=contents,
             config=types.GenerateContentConfig(
                 response_modalities=["IMAGE", "TEXT"],

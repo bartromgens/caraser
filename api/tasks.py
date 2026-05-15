@@ -4,6 +4,7 @@ import uuid
 from io import BytesIO
 
 from PIL import Image
+from django.conf import settings
 from django.core.files.base import ContentFile
 
 from .models import Transformation
@@ -29,12 +30,6 @@ def _to_jpeg(image_bytes: bytes, quality: int = 85) -> bytes:
 
 
 def _composite_annotation(original_bytes: bytes, overlay_bytes: bytes) -> bytes:
-    """Composite the painted overlay onto the original photo with fully opaque strokes.
-
-    Painted pixels are rendered at full opacity so Gemini sees the exact legend hex color.
-    Unpainted pixels (alpha=0 in the overlay) remain transparent and reveal the photo,
-    preserving spatial context for uncolored areas.
-    """
     base = Image.open(BytesIO(original_bytes)).convert("RGBA")
     overlay = Image.open(BytesIO(overlay_bytes)).convert("RGBA")
 
@@ -85,9 +80,16 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
         if transformation.mode == Transformation.Mode.DESIGNER:
             overlay_bytes = transformation.overlay_image.read()
             annotated_bytes = _composite_annotation(image_bytes, overlay_bytes)
+            transformation.annotated_image.save(
+                f"{transformation.pk}-annotated.jpg",
+                ContentFile(_to_jpeg(annotated_bytes)),
+                save=False,
+            )
             prompt = build_designer_prompt()
             transformation.prompt = prompt
-            transformation.save(update_fields=["prompt", "updated_at"])
+            transformation.save(
+                update_fields=["annotated_image", "prompt", "updated_at"]
+            )
             result_bytes = _to_jpeg(
                 generate_image(
                     [
@@ -95,6 +97,11 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
                         (annotated_bytes, "image/jpeg"),
                     ],
                     prompt,
+                    model=settings.GEMINI_DESIGNER_MODEL,
+                    image_labels=[
+                        "IMAGE 1 — original unmodified street photo (pixel-perfect source):",
+                        "IMAGE 2 — same photo with semi-transparent color zone annotations painted on top (zone map only, not a photo to edit):",
+                    ],
                 )
             )
         else:

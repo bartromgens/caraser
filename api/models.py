@@ -33,6 +33,9 @@ class Transformation(models.Model):
     overlay_image = models.ImageField(
         upload_to="overlays/%Y/%m/%d/", blank=True, null=True
     )
+    annotated_image = models.ImageField(
+        upload_to="annotated/%Y/%m/%d/", blank=True, null=True
+    )
     result_image = models.ImageField(
         upload_to="results/%Y/%m/%d/", blank=True, null=True
     )
