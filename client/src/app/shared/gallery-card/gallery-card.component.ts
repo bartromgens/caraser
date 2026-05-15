@@ -15,5 +15,6 @@ export class GalleryCardComponent {
   @Input() alt = '';
   @Input() itemId: number | string = '';
   @Input() imgLoading: 'eager' | 'lazy' = 'lazy';
+  @Input() imgFetchPriority: 'high' | 'low' | 'auto' = 'auto';
   @Input() borderRadius = '16px';
 }

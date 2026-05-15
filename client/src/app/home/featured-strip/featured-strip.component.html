@@ -13,6 +13,7 @@
       alt="Transformed street"
       [itemId]="item.id"
       [imgLoading]="i === 0 ? 'eager' : 'lazy'"
+      [imgFetchPriority]="i === 0 ? 'high' : 'auto'"
       borderRadius="12px"
     />
   </div>

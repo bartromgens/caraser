@@ -22,6 +22,7 @@
         [alt]="'Transformed street ' + item.id"
         [itemId]="item.id"
         [imgLoading]="i === 0 ? 'eager' : 'lazy'"
+        [imgFetchPriority]="i === 0 ? 'high' : 'auto'"
       />
     </div>
   </section>
@@ -35,6 +36,7 @@
         [alt]="'Transformed street ' + item.id"
         [itemId]="item.id"
         [imgLoading]="userItems().length === 0 && i === 0 ? 'eager' : 'lazy'"
+        [imgFetchPriority]="userItems().length === 0 && i === 0 ? 'high' : 'auto'"
       />
     </div>
   </section>
@@ -54,6 +56,9 @@
         [itemId]="item.id"
         [imgLoading]="
           userItems().length === 0 && featuredItems().length === 0 && i === 0 ? 'eager' : 'lazy'
+        "
+        [imgFetchPriority]="
+          userItems().length === 0 && featuredItems().length === 0 && i === 0 ? 'high' : 'auto'
         "
       />
     </div>

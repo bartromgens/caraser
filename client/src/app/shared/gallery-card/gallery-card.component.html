@@ -1,5 +1,11 @@
 <a class="gallery-card" [routerLink]="['/t', itemId]" [style.border-radius]="borderRadius">
-  <img [src]="src" [alt]="alt" class="gallery-card__img" [loading]="imgLoading" />
+  <img
+    [src]="src"
+    [alt]="alt"
+    class="gallery-card__img"
+    [loading]="imgLoading"
+    [attr.fetchpriority]="imgFetchPriority"
+  />
   <div class="gallery-card__overlay">
     <mat-icon>compare</mat-icon>
     <span>View comparison</span>
