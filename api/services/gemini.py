@@ -226,7 +226,7 @@ def generate_image(
     contents: list = []
     for i, (data, mime) in enumerate(image_parts):
         if image_labels and i < len(image_labels):
-            contents.append(image_labels[i])
+            contents.append(types.Part.from_text(text=image_labels[i]))
         contents.append(types.Part.from_bytes(data=data, mime_type=mime))
     contents.append(prompt)
     resolved_model = model or settings.GEMINI_MODEL

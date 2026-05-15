@@ -100,7 +100,7 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
                     model=settings.GEMINI_DESIGNER_MODEL,
                     image_labels=[
                         "IMAGE 1 — original unmodified street photo (pixel-perfect source):",
-                        "IMAGE 2 — same photo with semi-transparent color zone annotations painted on top (zone map only, not a photo to edit):",
+                        "IMAGE 2 — same photo with color zone annotations painted on top (zone map only, not a photo to edit):",
                     ],
                 )
             )

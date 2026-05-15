@@ -9,12 +9,6 @@ LEGEND: list[dict] = [
         "short": "flowers",
     },
     {
-        "hex": "#000000",
-        "color_name": "black",
-        "label": "Drivable road surface (asphalt)",
-        "short": "road",
-    },
-    {
         "hex": "#37B24D",
         "color_name": "green",
         "label": "Grass / lawn",
@@ -45,10 +39,10 @@ LEGEND: list[dict] = [
         "short": "stone",
     },
     {
-        "hex": "#9E9E9E",
-        "color_name": "gray",
-        "label": "Leave this area unchanged (keep original pixels)",
-        "short": "keep",
+        "hex": "#000000",
+        "color_name": "black",
+        "label": "Drivable road surface (asphalt)",
+        "short": "road",
     },
 ]
 
@@ -56,23 +50,13 @@ LEGEND: list[dict] = [
 def _color_directives() -> str:
     lines = []
     for entry in LEGEND:
-        name = entry["color_name"]
-        hex_ = entry["hex"]
-        if entry["short"] == "keep":
-            lines.append(
-                f"- {name} ({hex_}): Do NOT modify this area — "
-                "reproduce the original photo pixels here exactly as they are."
-            )
-        else:
-            lines.append(f"- {name} ({hex_}): {entry['label']}")
+        lines.append(f"- {entry['color_name']} ({entry['hex']}): {entry['label']}")
     return "\n".join(lines)
 
 
 def _forbidden_colors() -> str:
     lines = []
     for entry in LEGEND:
-        if entry["short"] in ("keep",):
-            continue
         lines.append(
             f"- {entry['color_name'].capitalize()} ({entry['hex']}): must NEVER appear as a "
             f"flat colored patch — replace it with photorealistic {entry['label'].lower()}"
@@ -91,8 +75,7 @@ to reproduce. They must never appear in your output.
 
 YOUR TASK: Produce a photorealistic version of this street that follows the design plan \
 in IMAGE 2. For each colored zone, replace it with the realistic content described in the \
-legend below. For gray zones (#9E9E9E / gray), copy those pixels exactly from IMAGE 1 unchanged. \
-For unpainted areas, also copy from IMAGE 1.
+legend below. For unpainted areas, copy from IMAGE 1.
 
 The final output must look like a real photograph taken with a camera. \
 No paint strokes, color tints, flat-colored surfaces, or artistic overlays may appear.
@@ -111,9 +94,7 @@ REMOVE (mandatory — zero exceptions):
 - Remove traffic signs.
 
 STRICT RULES:
-- Gray (#9E9E9E) zones: reproduce pixel-for-pixel from IMAGE 1 — do not modify these areas \
-(except to remove any vehicles present there).
-- All other colored zones: replace with photorealistic content matching the legend. \
+- All colored zones: replace with photorealistic content matching the legend. \
 The zone color itself must disappear entirely and be replaced by realistic texture and detail.
 - No annotation color may be visible anywhere in the output — not as a tint, wash, \
 overlay, or flat surface.
@@ -129,9 +110,4 @@ SEASON & LIGHT:
 MOOD: Warm, lively, and human-scaled — like a thriving European street on a sunny afternoon.
 
 STYLE: Photorealistic, natural daylight, high detail, no HDR over-processing.
-
-CRITICAL REMINDER: IMAGE 2 is a color-coded zone map — a plan, not a photo to edit. \
-Each colored zone tells you WHAT to render there (see legend above), not WHAT COLOR to use. \
-The output must be an entirely photorealistic street photograph. \
-Any flat colored patch in the output is a failure.
 """
