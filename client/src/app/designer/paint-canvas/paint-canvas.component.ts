@@ -10,7 +10,7 @@ import {
   ViewChild,
   signal,
 } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { NgFor, NgIf, TitleCasePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSliderModule } from '@angular/material/slider';
@@ -21,13 +21,22 @@ import { PaintColor } from '../../core/transformation.service';
 @Component({
   selector: 'app-paint-canvas',
   standalone: true,
-  imports: [NgFor, MatIconModule, MatButtonModule, MatSliderModule, MatTooltipModule, FormsModule],
+  imports: [
+    NgFor,
+    NgIf,
+    TitleCasePipe,
+    MatIconModule,
+    MatButtonModule,
+    MatSliderModule,
+    MatTooltipModule,
+    FormsModule,
+  ],
   templateUrl: './paint-canvas.component.html',
   styleUrl: './paint-canvas.component.scss',
 })
 export class PaintCanvasComponent implements OnChanges, OnDestroy {
   @Input() colors: PaintColor[] = [];
-  @Input() imageUrl!: string;
+  @Input() imageUrl?: string;
   @Input() naturalWidth = 0;
   @Input() naturalHeight = 0;
   @Output() hasStrokes = new EventEmitter<boolean>();
@@ -38,7 +47,7 @@ export class PaintCanvasComponent implements OnChanges, OnDestroy {
   @ViewChild('imageEl', { static: false }) imageElRef!: ElementRef<HTMLImageElement>;
 
   activeColor = signal<PaintColor | null>(null);
-  brushSize = 50;
+  brushSize = 105;
   isEraser = signal(false);
 
   private painting = false;

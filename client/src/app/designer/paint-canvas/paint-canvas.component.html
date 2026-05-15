@@ -1,6 +1,7 @@
 <div class="paint-canvas-wrapper">
   <!-- Hidden off-screen canvas at natural image resolution for PNG export -->
   <canvas
+    *ngIf="imageUrl"
     #offscreenCanvas
     class="offscreen-canvas"
     [width]="naturalWidth"
@@ -9,63 +10,56 @@
 
   <!-- Toolbar -->
   <div class="paint-toolbar">
+    <div class="toolbar-tools">
+      <button
+        mat-icon-button
+        [class.tool-active]="isEraser()"
+        matTooltip="Eraser"
+        (click)="toggleEraser()"
+        type="button"
+      >
+        <mat-icon fontSet="material-symbols-outlined">ink_eraser</mat-icon>
+      </button>
+
+      <button mat-icon-button matTooltip="Undo" (click)="undo()" type="button">
+        <mat-icon>undo</mat-icon>
+      </button>
+
+      <button mat-icon-button matTooltip="Clear all paint" (click)="clearAll()" type="button">
+        <mat-icon>delete_sweep</mat-icon>
+      </button>
+
+      <div class="tool-divider"></div>
+
+      <div class="brush-size">
+        <mat-icon class="brush-icon">brush</mat-icon>
+        <mat-slider min="5" max="200" step="5">
+          <input matSliderThumb [(ngModel)]="brushSize" />
+        </mat-slider>
+      </div>
+    </div>
+
     <div class="palette">
       <button
         *ngFor="let color of colors"
         class="swatch"
         [class.swatch--active]="!isEraser() && activeColor()?.hex === color.hex"
-        [style.background]="color.hex"
-        [style.border-color]="color.hex === '#FFFFFF' ? '#ccc' : color.hex"
         [matTooltip]="color.label"
         (click)="selectColor(color)"
         type="button"
-      ></button>
-    </div>
-
-    <div class="tool-divider"></div>
-
-    <button
-      mat-icon-button
-      [class.tool-active]="isEraser()"
-      matTooltip="Eraser"
-      (click)="toggleEraser()"
-      type="button"
-    >
-      <mat-icon>ink_eraser</mat-icon>
-    </button>
-
-    <button mat-icon-button matTooltip="Undo" (click)="undo()" type="button">
-      <mat-icon>undo</mat-icon>
-    </button>
-
-    <button mat-icon-button matTooltip="Clear all paint" (click)="clearAll()" type="button">
-      <mat-icon>delete_sweep</mat-icon>
-    </button>
-
-    <div class="tool-divider"></div>
-
-    <div class="brush-size">
-      <mat-icon class="brush-icon">brush</mat-icon>
-      <mat-slider min="5" max="200" step="5">
-        <input matSliderThumb [(ngModel)]="brushSize" />
-      </mat-slider>
-    </div>
-  </div>
-
-  <!-- Legend chips -->
-  <div class="legend">
-    <div *ngFor="let color of colors" class="legend-item">
-      <span
-        class="legend-dot"
-        [style.background]="color.hex"
-        [style.border-color]="color.hex === '#FFFFFF' ? '#ccc' : color.hex"
-      ></span>
-      <span class="legend-label">{{ color.label }}</span>
+      >
+        <span
+          class="swatch-dot"
+          [style.background]="color.hex"
+          [style.border-color]="color.hex === '#FFFFFF' ? '#ccc' : color.hex"
+        ></span>
+        <span class="swatch-label">{{ color.short | titlecase }}</span>
+      </button>
     </div>
   </div>
 
   <!-- Canvas stage: photo + overlay -->
-  <div class="canvas-stage">
+  <div *ngIf="imageUrl" class="canvas-stage">
     <img #imageEl [src]="imageUrl" class="canvas-photo" alt="Street photo" draggable="false" />
     <canvas
       #displayCanvas

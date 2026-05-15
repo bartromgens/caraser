@@ -18,6 +18,12 @@
   margin-left: 2px;
 }
 
+.nav-designer {
+  @media (max-width: 599px) {
+    display: none;
+  }
+}
+
 .main-content {
   height: calc(100dvh - 64px);
   overflow: auto;

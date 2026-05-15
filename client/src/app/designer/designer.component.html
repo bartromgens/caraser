@@ -9,6 +9,8 @@
       </p>
     </header>
 
+    <app-paint-canvas *ngIf="paintColors().length" [colors]="paintColors()"></app-paint-canvas>
+
     <div
       class="dropzone"
       [ngClass]="{ 'dropzone--active': isDragOver() }"
