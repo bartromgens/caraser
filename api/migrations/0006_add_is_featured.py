@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0005_add_formal_wilderness_shape_styles'),
+        ("api", "0005_add_formal_wilderness_shape_styles"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='transformation',
-            name='is_featured',
+            model_name="transformation",
+            name="is_featured",
             field=models.BooleanField(db_index=True, default=False),
         ),
     ]

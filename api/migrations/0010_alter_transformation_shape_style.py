@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0009_add_mixed_shape_style'),
+        ("api", "0009_add_mixed_shape_style"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='transformation',
-            name='shape_style',
-            field=models.CharField(choices=[('mixed', 'Mixed'), ('organic', 'Organic'), ('straight', 'Straight'), ('wilderness', 'Wilderness')], default='mixed', max_length=16),
+            model_name="transformation",
+            name="shape_style",
+            field=models.CharField(
+                choices=[
+                    ("mixed", "Mixed"),
+                    ("organic", "Organic"),
+                    ("straight", "Straight"),
+                    ("wilderness", "Wilderness"),
+                ],
+                default="mixed",
+                max_length=16,
+            ),
         ),
     ]

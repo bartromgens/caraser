@@ -6,7 +6,9 @@ from api.services.comparison import build_comparison_image
 
 
 class Command(BaseCommand):
-    help = "Generate (or regenerate) comparison images for all completed transformations."
+    help = (
+        "Generate (or regenerate) comparison images for all completed transformations."
+    )
 
     def add_arguments(self, parser):
         parser.add_argument(

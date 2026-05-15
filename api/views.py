@@ -83,6 +83,38 @@ def _extract_options(request: Request) -> dict:
     }
 
 
+def _to_png_overlay(file, target_width: int, target_height: int):
+    """Validate and resize the overlay PNG to match the processed original dimensions."""
+    try:
+        img = Image.open(file)
+        img.verify()
+        file.seek(0)
+        img = Image.open(file)
+    except Exception:
+        return None, "Overlay is not a valid image."
+
+    if img.format not in ("PNG",):
+        # Re-open after verify resets the object; allow any PNG-compatible format
+        pass
+
+    img = img.convert("RGBA")
+    if img.width != target_width or img.height != target_height:
+        img = img.resize((target_width, target_height), Image.NEAREST)
+
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    size = len(buf.getvalue())
+    from django.core.files.uploadedfile import InMemoryUploadedFile
+
+    name = getattr(file, "name", "overlay")
+    stem = name.rsplit(".", 1)[0] if "." in name else name
+    return (
+        InMemoryUploadedFile(buf, "overlay", f"{stem}.png", "image/png", size, None),
+        None,
+    )
+
+
 @csrf_protect
 @api_view(["POST"])
 @parser_classes([MultiPartParser])
@@ -97,11 +129,46 @@ def transformation_create(request: Request) -> Response:
     if error:
         return Response({"detail": error}, status=status.HTTP_400_BAD_REQUEST)
 
-    file = _to_jpeg_upload(file)
-    transformation = Transformation.objects.create(
-        original_image=file,
-        **_extract_options(request),
+    mode = _parse_choice(
+        request.data.get("mode"),
+        Transformation.Mode,
+        Transformation.Mode.CLASSIC,
     )
+
+    jpeg_file = _to_jpeg_upload(file)
+
+    if mode == Transformation.Mode.DESIGNER:
+        overlay_file_raw = request.FILES.get("overlay")
+        if overlay_file_raw is None:
+            return Response(
+                {"detail": "Designer mode requires an overlay image."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        # Determine the dimensions of the processed JPEG so the overlay can be matched.
+        jpeg_file.seek(0)
+        processed_img = Image.open(jpeg_file)
+        target_w, target_h = processed_img.width, processed_img.height
+        jpeg_file.seek(0)
+
+        overlay_file, overlay_error = _to_png_overlay(
+            overlay_file_raw, target_w, target_h
+        )
+        if overlay_error:
+            return Response(
+                {"detail": overlay_error}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        transformation = Transformation.objects.create(
+            original_image=jpeg_file,
+            overlay_image=overlay_file,
+            mode=mode,
+        )
+    else:
+        transformation = Transformation.objects.create(
+            original_image=jpeg_file,
+            **_extract_options(request),
+        )
+
     start_processing(transformation.pk)
 
     serializer = TransformationCreateSerializer(

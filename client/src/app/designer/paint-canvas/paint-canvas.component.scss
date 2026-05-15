@@ -1,0 +1,126 @@
+.paint-canvas-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.offscreen-canvas {
+  display: none;
+}
+
+// Toolbar
+.paint-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--mat-sys-surface-container);
+  border-radius: 12px;
+}
+
+.palette {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    border-color 0.1s;
+  padding: 0;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+
+  &--active {
+    border-color: var(--mat-sys-primary) !important;
+    transform: scale(1.2);
+    box-shadow: 0 0 0 2px var(--mat-sys-on-surface);
+  }
+}
+
+.tool-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--mat-sys-outline-variant);
+  margin: 0 4px;
+}
+
+.tool-active {
+  color: var(--mat-sys-primary);
+}
+
+.brush-size {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  mat-slider {
+    width: 100px;
+  }
+}
+
+.brush-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Legend
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+
+// Canvas stage
+.canvas-stage {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.canvas-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+
+.display-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.65;
+}

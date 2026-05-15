@@ -6,28 +6,41 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0001_initial'),
+        ("api", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='transformation',
-            name='allow_cars',
+            model_name="transformation",
+            name="allow_cars",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='transformation',
-            name='fietsstraat',
+            model_name="transformation",
+            name="fietsstraat",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='transformation',
-            name='ground_cover',
-            field=models.CharField(choices=[('mixed', 'Mixed'), ('stones', 'Stones'), ('grass', 'Grass'), ('flowers', 'Flowers')], default='mixed', max_length=16),
+            model_name="transformation",
+            name="ground_cover",
+            field=models.CharField(
+                choices=[
+                    ("mixed", "Mixed"),
+                    ("stones", "Stones"),
+                    ("grass", "Grass"),
+                    ("flowers", "Flowers"),
+                ],
+                default="mixed",
+                max_length=16,
+            ),
         ),
         migrations.AddField(
-            model_name='transformation',
-            name='shape_style',
-            field=models.CharField(choices=[('organic', 'Organic'), ('straight', 'Straight')], default='organic', max_length=16),
+            model_name="transformation",
+            name="shape_style",
+            field=models.CharField(
+                choices=[("organic", "Organic"), ("straight", "Straight")],
+                default="organic",
+                max_length=16,
+            ),
         ),
     ]

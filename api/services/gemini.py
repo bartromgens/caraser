@@ -207,26 +207,23 @@ def _diagnose_no_image(response) -> str:
     return ", ".join(parts)
 
 
-def remove_cars(
-    image_bytes: bytes,
-    mime_type: str = "image/jpeg",
-    options: PromptOptions | None = None,
-    prompt: str | None = None,
+def generate_image(
+    image_parts: list[tuple[bytes, str]],
+    prompt: str,
 ) -> bytes:
-    if prompt is None:
-        prompt = build_prompt(options or PromptOptions())
+    """Call Gemini with one or more image parts plus a text prompt, return image bytes."""
     client = genai.Client(
         api_key=settings.GEMINI_API_KEY,
         http_options=_HTTP_OPTIONS,
     )
+    contents = [
+        types.Part.from_bytes(data=data, mime_type=mime) for data, mime in image_parts
+    ] + [prompt]
     diagnostic = ""
     for attempt in range(1, _NO_IMAGE_MAX_ATTEMPTS + 1):
         response = client.models.generate_content(
             model=settings.GEMINI_MODEL,
-            contents=[
-                types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
-                prompt,
-            ],
+            contents=contents,
             config=types.GenerateContentConfig(
                 response_modalities=["IMAGE", "TEXT"],
                 image_config=types.ImageConfig(image_size=settings.GEMINI_IMAGE_SIZE),
@@ -245,3 +242,14 @@ def remove_cars(
     raise GeminiNoImageError(
         f"Gemini returned no image after {_NO_IMAGE_MAX_ATTEMPTS} attempts ({diagnostic})"
     )
+
+
+def remove_cars(
+    image_bytes: bytes,
+    mime_type: str = "image/jpeg",
+    options: PromptOptions | None = None,
+    prompt: str | None = None,
+) -> bytes:
+    if prompt is None:
+        prompt = build_prompt(options or PromptOptions())
+    return generate_image([(image_bytes, mime_type)], prompt)

@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0002_transformation_allow_cars_transformation_fietsstraat_and_more'),
+        ("api", "0002_transformation_allow_cars_transformation_fietsstraat_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='transformation',
-            name='comparison_image',
-            field=models.ImageField(blank=True, null=True, upload_to='comparisons/%Y/%m/%d/'),
+            model_name="transformation",
+            name="comparison_image",
+            field=models.ImageField(
+                blank=True, null=True, upload_to="comparisons/%Y/%m/%d/"
+            ),
         ),
     ]

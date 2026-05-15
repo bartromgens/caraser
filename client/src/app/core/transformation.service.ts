@@ -14,7 +14,9 @@ export interface TransformationOptions {
 
 export interface Transformation extends TransformationOptions {
   id: string;
+  mode: 'classic' | 'designer';
   original_image: string;
+  overlay_image: string | null;
   result_image: string | null;
   thumbnail_image: string | null;
   comparison_image: string | null;
@@ -45,6 +47,14 @@ export class TransformationService {
     form.append('fietsstraat', String(options.fietsstraat));
     form.append('ground_cover', options.ground_cover);
     form.append('shape_style', options.shape_style);
+    return this.http.post<Transformation>('/api/transformations/upload/', form);
+  }
+
+  uploadDesigner(file: File, overlayPng: Blob): Observable<Transformation> {
+    const form = new FormData();
+    form.append('image', file);
+    form.append('overlay', overlayPng, 'overlay.png');
+    form.append('mode', 'designer');
     return this.http.post<Transformation>('/api/transformations/upload/', form);
   }
 

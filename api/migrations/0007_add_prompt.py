@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0006_add_is_featured'),
+        ("api", "0006_add_is_featured"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='transformation',
-            name='prompt',
+            model_name="transformation",
+            name="prompt",
             field=models.TextField(blank=True),
         ),
     ]

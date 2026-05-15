@@ -36,6 +36,7 @@ class TransformationAdmin(admin.ModelAdmin):
     @admin.action(description="Unmark selected as featured")
     def unmark_featured(self, request, queryset):
         queryset.update(is_featured=False)
+
     search_fields = ("id", "error")
     readonly_fields = (
         "id",

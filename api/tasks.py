@@ -8,7 +8,8 @@ from django.core.files.base import ContentFile
 
 from .models import Transformation
 from .services.comparison import build_comparison_image
-from .services.gemini import PromptOptions, build_prompt, remove_cars
+from .services.designer import build_designer_prompt
+from .services.gemini import PromptOptions, build_prompt, generate_image, remove_cars
 
 logger = logging.getLogger(__name__)
 
@@ -21,11 +22,35 @@ THUMBNAIL_WIDTH = 600
 
 def _to_jpeg(image_bytes: bytes, quality: int = 85) -> bytes:
     buf = BytesIO()
-    Image.open(BytesIO(image_bytes)).convert("RGB").save(buf, format="JPEG", quality=quality)
+    Image.open(BytesIO(image_bytes)).convert("RGB").save(
+        buf, format="JPEG", quality=quality
+    )
     return buf.getvalue()
 
 
-def _to_thumbnail(image_bytes: bytes, width: int = THUMBNAIL_WIDTH, quality: int = 80) -> bytes:
+def _composite_annotation(original_bytes: bytes, overlay_bytes: bytes) -> bytes:
+    """Composite the painted overlay onto the original photo with fully opaque strokes.
+
+    Painted pixels are rendered at full opacity so Gemini sees the exact legend hex color.
+    Unpainted pixels (alpha=0 in the overlay) remain transparent and reveal the photo,
+    preserving spatial context for uncolored areas.
+    """
+    base = Image.open(BytesIO(original_bytes)).convert("RGBA")
+    overlay = Image.open(BytesIO(overlay_bytes)).convert("RGBA")
+
+    if overlay.size != base.size:
+        overlay = overlay.resize(base.size, Image.NEAREST)
+
+    composite = Image.alpha_composite(base, overlay)
+    buf = BytesIO()
+    composite.convert("RGB").save(buf, format="JPEG", quality=90)
+    buf.seek(0)
+    return buf.getvalue()
+
+
+def _to_thumbnail(
+    image_bytes: bytes, width: int = THUMBNAIL_WIDTH, quality: int = 80
+) -> bytes:
     img = Image.open(BytesIO(image_bytes)).convert("RGB")
     if img.width > width:
         height = int(img.height * width / img.width)
@@ -57,11 +82,26 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
     try:
         image_bytes = transformation.original_image.read()
 
-        prompt = build_prompt(_options_from(transformation))
-        transformation.prompt = prompt
-        transformation.save(update_fields=["prompt", "updated_at"])
-
-        result_bytes = _to_jpeg(remove_cars(image_bytes, prompt=prompt))
+        if transformation.mode == Transformation.Mode.DESIGNER:
+            overlay_bytes = transformation.overlay_image.read()
+            annotated_bytes = _composite_annotation(image_bytes, overlay_bytes)
+            prompt = build_designer_prompt()
+            transformation.prompt = prompt
+            transformation.save(update_fields=["prompt", "updated_at"])
+            result_bytes = _to_jpeg(
+                generate_image(
+                    [
+                        (image_bytes, "image/jpeg"),
+                        (annotated_bytes, "image/jpeg"),
+                    ],
+                    prompt,
+                )
+            )
+        else:
+            prompt = build_prompt(_options_from(transformation))
+            transformation.prompt = prompt
+            transformation.save(update_fields=["prompt", "updated_at"])
+            result_bytes = _to_jpeg(remove_cars(image_bytes, prompt=prompt))
         thumbnail_bytes = _to_thumbnail(result_bytes)
         comparison_bytes = build_comparison_image(image_bytes, result_bytes)
 
@@ -72,11 +112,19 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
             f"{transformation.pk}-thumb.jpg", ContentFile(thumbnail_bytes), save=False
         )
         transformation.comparison_image.save(
-            f"{transformation.pk}-comparison.jpg", ContentFile(comparison_bytes), save=False
+            f"{transformation.pk}-comparison.jpg",
+            ContentFile(comparison_bytes),
+            save=False,
         )
         transformation.status = Transformation.Status.DONE
         transformation.save(
-            update_fields=["result_image", "thumbnail_image", "comparison_image", "status", "updated_at"]
+            update_fields=[
+                "result_image",
+                "thumbnail_image",
+                "comparison_image",
+                "status",
+                "updated_at",
+            ]
         )
     except Exception as exc:
         logger.exception("Transformation %s failed", transformation_id)
@@ -86,5 +134,7 @@ def process_transformation(transformation_id: uuid.UUID) -> None:
 
 
 def start_processing(transformation_id: uuid.UUID) -> None:
-    t = threading.Thread(target=process_transformation, args=(transformation_id,), daemon=True)
+    t = threading.Thread(
+        target=process_transformation, args=(transformation_id,), daemon=True
+    )
     t.start()
