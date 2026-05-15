@@ -60,6 +60,10 @@ export class DesignerComponent implements OnInit, OnDestroy {
       description: 'Draw your ideal street design with colors and let AI bring it to life.',
     });
     this.service.getLegend().subscribe({ next: (colors) => this.paintColors.set(colors) });
+    const file = (history.state as { file?: File })?.file;
+    if (file instanceof File) {
+      this.processFile(file);
+    }
   }
 
   ngOnDestroy(): void {

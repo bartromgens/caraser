@@ -136,6 +136,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.tracking.trackEvent('Upload', 'reset_options');
   }
 
+  openInDesigner(): void {
+    const file = this.selectedFile();
+    if (!file) return;
+    this.router.navigate(['/designer'], { state: { file } });
+    this.tracking.trackEvent('Upload', 'open_in_designer');
+  }
+
   changeImage(): void {
     if (this.previewUrl()) {
       URL.revokeObjectURL(this.previewUrl()!);
