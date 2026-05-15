@@ -27,6 +27,12 @@ LEGEND: list[dict] = [
         "short": "water",
     },
     {
+        "hex": "#4B0082",
+        "color_name": "dark purple",
+        "label": "Children's play area with play equipment and rubber safety surfacing",
+        "short": "play area",
+    },
+    {
         "hex": "#FFD60A",
         "color_name": "yellow",
         "label": "Seating / benches with people",
@@ -102,6 +108,13 @@ overlay, or flat surface.
 to IMAGE 1 — do not add, remove, or alter any architecture.
 - Maintain the exact same camera angle and perspective as IMAGE 1.
 - The total street corridor width from building facade to building facade must remain unchanged.
+
+POPULATE WITH PEOPLE:
+- Children playing freely in the open space
+- Adults sitting at café-style seating, talking and relaxing
+- Benches integrated along the street, with people sitting on them
+- Cyclists passing gently through
+- Birds in the sky
 
 SEASON & LIGHT:
 - Depict spring or summer; all trees in full leaf.
