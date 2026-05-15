@@ -9,32 +9,30 @@ LOCAL_BACKUP_DIR="${HOME}/backup/caraser"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 BACKUP_DIR="${VPS_PATH}/backups/${TIMESTAMP}"
 
-echo "Creating backup ${TIMESTAMP} on ${VPS_HOST}..."
+SSH="ssh ${VPS_USER}@${VPS_HOST}"
 
-ssh "${VPS_USER}@${VPS_HOST}" bash <<EOF
-  set -euo pipefail
-  mkdir -p "${BACKUP_DIR}"
+echo "==> [1/4] Creating backup directory ${BACKUP_DIR}..."
+$SSH "mkdir -p '${BACKUP_DIR}'"
 
-  echo "Backing up PostgreSQL..."
-  docker compose -f "${VPS_PATH}/docker-compose.prod.yml" exec -T db \
-    pg_dump -U caraser caraser | gzip > "${BACKUP_DIR}/db.sql.gz"
+echo "==> [2/4] Backing up PostgreSQL..."
+$SSH "docker compose -f '${VPS_PATH}/docker-compose.prod.yml' exec -T db \
+  pg_dump -U caraser caraser 2>/dev/null | gzip > '${BACKUP_DIR}/db.sql.gz'"
 
-  echo "Backing up media files..."
-  tar -czf "${BACKUP_DIR}/media.tar.gz" -C "${VPS_PATH}" media
+echo "==> [3/4] Backing up media files..."
+$SSH "docker compose -f '${VPS_PATH}/docker-compose.prod.yml' exec -T api \
+  tar -czf - /app/media 2>/dev/null > '${BACKUP_DIR}/media.tar.gz'"
 
-  echo "Removing backups older than 30 days..."
-  find "${VPS_PATH}/backups" -maxdepth 1 -mindepth 1 -type d -mtime +30 \
-    -exec rm -rf {} +
+echo "==> [4/4] Removing backups older than 30 days..."
+$SSH "find '${VPS_PATH}/backups' -maxdepth 1 -mindepth 1 -type d -mtime +30 -exec rm -rf {} +"
 
-  echo "Backup complete: ${BACKUP_DIR}"
-  du -sh "${BACKUP_DIR}"/*
-EOF
+echo "==> Backup complete: ${BACKUP_DIR}"
+$SSH "du -sh '${BACKUP_DIR}'/*"
 
-echo "Syncing backup to local ${LOCAL_BACKUP_DIR}..."
+echo "==> Syncing backup to local ${LOCAL_BACKUP_DIR}..."
 mkdir -p "${LOCAL_BACKUP_DIR}"
 rsync -av --progress \
   "${VPS_USER}@${VPS_HOST}:${BACKUP_DIR}/" \
   "${LOCAL_BACKUP_DIR}/${TIMESTAMP}/"
 
-echo "Local backup saved to ${LOCAL_BACKUP_DIR}/${TIMESTAMP}/"
+echo "==> Local backup saved to ${LOCAL_BACKUP_DIR}/${TIMESTAMP}/"
 du -sh "${LOCAL_BACKUP_DIR}/${TIMESTAMP}/"*
